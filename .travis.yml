@@ -3,13 +3,14 @@ python:
   - "2.7"
   - "3.3"
 env:
-  - DJANGO_MIN_VERSION=1.8
-  - DJANGO_LIMIT_VERSION=1.9
+  matrix:
+   - DJANGO="Django<1.9"
+   - DJANGO="Django==1.9b1"
 # command to install dependencies
 install:
   - "pip install -q -e ."
   - "pip install -q -r demo/requirements.txt"
-  - "pip install -q 'Django>=$DJANGO_VERSION,<$DJANGO_LIMIT_VERSION'"
+  - pip install "$DJANGO"
 
 # command to run tests
 script: "cd demo && python manage.py test plans"
