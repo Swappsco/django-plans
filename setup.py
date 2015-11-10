@@ -7,12 +7,12 @@ with open('README.rst') as file:
 
 setup(
     name='django-plans',
-    version='0.7alpha',
+    version='0.8.0',
     description='Pluggable django app for managing pricing plans with quotas and accounts expiration',
     long_description=long_description,
     author='Krzysztof Dorosz',
-    author_email='cypreess@gmail.com',
-    url='https://github.com/cypreess/django-plans',
+    author_email='dev@swapps.co',
+    url='https://github.com/Swappsco/django-plans',
     license='MIT',
 
     packages=find_packages(),
@@ -29,7 +29,7 @@ setup(
     install_requires=[
         'django-countries>=2.0',
         'pytz>=2013.9',
-        'django-ordered-model>=0.3.0',
+        'django-ordered-model>=0.4.2',
         'vatnumber>=1.1',
         'celery',
         'suds-jurko',

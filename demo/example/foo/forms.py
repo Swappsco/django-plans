@@ -10,6 +10,7 @@ class FooForm(ModelForm):
         widgets = {
             'user': HiddenInput,
         }
+        fields = '__all__'
 
     def clean(self):
         cleaned_data = super(FooForm, self).clean()
