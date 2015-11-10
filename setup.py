@@ -29,7 +29,7 @@ setup(
     install_requires=[
         'django-countries>=2.0',
         'pytz>=2013.9',
-        'django-ordered-model>=0.3.0',
+        'django-ordered-model>=0.4.2',
         'vatnumber>=1.1',
         'celery',
         'suds-jurko',
