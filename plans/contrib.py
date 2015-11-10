@@ -6,8 +6,8 @@ from django.template import loader
 from django.utils import translation
 try:
     from django.apps import apps
-    get_model = apps.get_model
-except ImportError:
+    cache = apps
+except (ImportError) as e:
     from django.db.models.loading import cache
 
 from plans.signals import user_language
