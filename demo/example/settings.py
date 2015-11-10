@@ -80,7 +80,6 @@ WSGI_APPLICATION = 'example.wsgi.application'
 TEMPLATE_DIRS = (
     os.path.join(SITE_ROOT, 'templates'),
 )
-print SITE_ROOT
 
 INSTALLED_APPS = (
     'django.contrib.admin',
