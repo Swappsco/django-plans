@@ -25,7 +25,9 @@ def load_mock_data(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
+        # Requires plans because that will be populated too
         ('foo', '0001_initial'),
+        ('plans', '0001_initial'),
     ]
 
     operations = [
