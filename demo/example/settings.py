@@ -120,11 +120,18 @@ LOGGING = {
 
 
 # This is required for django-plans
-
-TEMPLATE_CONTEXT_PROCESSORS = global_settings.TEMPLATE_CONTEXT_PROCESSORS + (
-    'django.core.context_processors.request',
-    'plans.context_processors.account_status'
-)
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.request',
+                'plans.context_processors.account_status',
+            ],
+        },
+    },
+]
 
 
 LANGUAGES = (

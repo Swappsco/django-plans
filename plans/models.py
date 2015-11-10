@@ -602,9 +602,9 @@ class Invoice(models.Model):
 
         :return: string (generated full number)
         """
-        format = getattr(settings, "PLANS_INVOICE_NUMBER_FORMAT",
+        invoice_format = getattr(settings, "PLANS_INVOICE_NUMBER_FORMAT",
                          "{{ invoice.number }}/{% ifequal invoice.type invoice.INVOICE_TYPES.PROFORMA %}PF{% else %}FV{% endifequal %}/{{ invoice.issued|date:'m/Y' }}")
-        return Template(format).render(Context({'invoice': self}))
+        return Template(invoice_format).render(Context({'invoice': self}))
 
 
     def set_issuer_invoice_data(self):
