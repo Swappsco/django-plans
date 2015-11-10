@@ -4,8 +4,14 @@ from django.core import mail
 from django.core.exceptions import ImproperlyConfigured
 from django.template import loader
 from django.utils import translation
-from django.db.models.loading import cache
+try:
+    from django.apps import apps
+    cache = apps
+except (ImportError) as e:
+    from django.db.models.loading import cache
+
 from plans.signals import user_language
+
 
 email_logger = logging.getLogger('emails')
 
