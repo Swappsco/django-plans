@@ -8,7 +8,6 @@ EMAIL_FROM = "Test <test@server.com>"
 SITE_ROOT = os.path.dirname(os.path.realpath(__file__))
 
 DEBUG = True
-TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
@@ -77,10 +76,6 @@ MIDDLEWARE_CLASSES = (
 ROOT_URLCONF = 'example.urls'
 WSGI_APPLICATION = 'example.wsgi.application'
 
-TEMPLATE_DIRS = (
-    os.path.join(SITE_ROOT, 'templates'),
-)
-
 INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.auth',
@@ -124,11 +119,15 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'APP_DIRS': True,
+        'DIRS': [
+            os.path.join(SITE_ROOT, 'templates'),
+        ],
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.request',
                 'plans.context_processors.account_status',
             ],
+            'debug': DEBUG,
         },
     },
 ]
