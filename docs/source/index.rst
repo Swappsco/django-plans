@@ -2,11 +2,6 @@ Welcome to django-plans's documentation!
 ========================================
 Django-plans is a pluggable app for managing pricing plans with quotas and accounts expiration.
 
-.. image:: _static/images/django-plans-1.png
-   :align: center
-
-
-
 Contents:
 ---------
 .. toctree::
