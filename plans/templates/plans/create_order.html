@@ -21,7 +21,7 @@
 
     {% else %}
 
-        <form method="post">
+        <form method="post" action="">
             {% with object as order %}
                 {% include "plans/order_detail_table.html" %}
             {% endwith %}

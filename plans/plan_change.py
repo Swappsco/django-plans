@@ -7,8 +7,8 @@ class PlanChangePolicy(object):
         """
         Finds most fitted plan pricing for a given period, and calculate day cost
         """
-        if plan.is_free():
-            # If plan is free then cost is always 0
+        if plan is None or plan.is_free():
+            # If plan is free or user has no plan then cost is always 0
             return 0
 
         plan_pricings = plan.planpricing_set.order_by('-pricing__period').select_related('pricing')

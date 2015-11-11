@@ -27,7 +27,7 @@ class Migration(migrations.Migration):
     dependencies = [
         # Requires plans because that will be populated too
         ('foo', '0001_initial'),
-        ('plans', '0001_initial'),
+        ('plans', '0002_auto_20151111_1101'),
     ]
 
     operations = [

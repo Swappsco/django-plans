@@ -6,7 +6,7 @@
 
     <h1>FakePayments™</h1>
     <p> Please select desired status after performing payment for an <strong>{{ object }}</strong>. </p>
-    <form method="POST">
+    <form method="POST" action="">
         {% csrf_token %}
         {{ form.as_p }}
         <button type="submit" class="btn btn-primary">

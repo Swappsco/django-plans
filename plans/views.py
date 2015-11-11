@@ -143,7 +143,7 @@ class ChangePlanView(LoginRequired, View):
     """
     A view for instant changing user plan when it does not require additional payment.
     Plan can be changed without payment when:
-    * user can enable this plan (it is available & visible and if it is customized it is for him,
+    * user can enable this plan (it is available & visible and if it is customized for him,
     * plan is different from the current one that user have,
     * within current change plan policy this does not require any additional payment (None)
 
@@ -175,6 +175,13 @@ class ChangePlanView(LoginRequired, View):
 class CreateOrderView(LoginRequired, CreateView):
     template_name = "plans/create_order.html"
     form_class = CreateOrderForm
+
+    #def get(self, request, **kwargs):
+    #    """
+    #    If the user does not have a plan yet and the plan
+    #    is a free plan, generating an order is not necessary
+    #    """
+
 
     def recalculate(self, amount, billing_info):
         """
@@ -232,10 +239,11 @@ class CreateOrderView(LoginRequired, CreateView):
         # User is not allowed to create new order for Plan when he has different Plan
         # unless it's a free plan. Otherwise, the should use Plan Change View for this
         # kind of action
-        if not self.request.user.userplan.is_expired() \
-                and not self.request.user.userplan.plan.is_free() \
-                and self.request.user.userplan.plan != self.plan_pricing.plan:
-            raise Http404
+        if self.request.user.userplan.plan is not None:
+            if not self.request.user.userplan.is_expired() \
+                    and not self.request.user.userplan.plan.is_free() \
+                    and self.request.user.userplan.plan != self.plan_pricing.plan:
+                raise Http404
 
         self.plan = self.plan_pricing.plan
         self.pricing = self.plan_pricing.pricing
