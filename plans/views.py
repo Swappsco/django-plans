@@ -239,10 +239,11 @@ class CreateOrderView(LoginRequired, CreateView):
         # User is not allowed to create new order for Plan when he has different Plan
         # unless it's a free plan. Otherwise, the should use Plan Change View for this
         # kind of action
-        if not self.request.user.userplan.is_expired() \
-                and not self.request.user.userplan.plan.is_free() \
-                and self.request.user.userplan.plan != self.plan_pricing.plan:
-            raise Http404
+        if self.request.user.userplan.plan is not None:
+            if not self.request.user.userplan.is_expired() \
+                    and not self.request.user.userplan.plan.is_free() \
+                    and self.request.user.userplan.plan != self.plan_pricing.plan:
+                raise Http404
 
         self.plan = self.plan_pricing.plan
         self.pricing = self.plan_pricing.pricing

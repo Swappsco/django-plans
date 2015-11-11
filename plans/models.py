@@ -227,7 +227,8 @@ class UserPlan(models.Model):
             status = True
         else:
             # Processing standard account extending procedure
-            if self.plan == plan:
+            if self.plan == plan or self.plan is None:
+                self.plan = plan
                 status = True
                 if self.expire is not None and self.expire > date.today():
                     self.expire += timedelta(days=pricing.period)
