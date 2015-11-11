@@ -33,8 +33,7 @@ def set_default_user_plan(sender, instance, created, **kwargs):
 
     if created:
         default_plan = Plan.get_default_plan()
-        if default_plan is not None:
-            UserPlan.objects.create(user=instance, plan=default_plan, active=False, expire=None)
+        UserPlan.objects.create(user=instance, plan=default_plan, active=False, expire=None)
 
 
 # Hook to django-registration to initialize plan automatically after user has confirm account

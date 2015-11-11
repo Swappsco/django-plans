@@ -141,7 +141,7 @@ class UserPlan(models.Model):
     Currently selected plan for user account.
     """
     user = models.OneToOneField(settings.AUTH_USER_MODEL, verbose_name=_('user'))
-    plan = models.ForeignKey('Plan', verbose_name=_('plan'))
+    plan = models.ForeignKey('Plan', verbose_name=_('plan'), null=True)
     expire = models.DateField(_('expire'), default=None, blank=True, null=True, db_index=True)
     active = models.BooleanField(_('active'), default=True, db_index=True)
 
@@ -192,7 +192,7 @@ class UserPlan(models.Model):
         """
         Set up user plan for first use
         """
-        if not self.is_active():
+        if not self.is_active() and self.plan is not None:
             # Plans without pricings don't need to expire
             if self.expire is None and self.plan.planpricing_set.count():
                 self.expire = now() + timedelta(
