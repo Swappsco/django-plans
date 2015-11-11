@@ -3,6 +3,9 @@ Welcome to django-plans
 
 .. image:: https://travis-ci.org/swappsco/django-plans.svg?branch=master   
    :target: https://travis-ci.org/swappsco/django-plans
+
+.. image:: https://coveralls.io/repos/swappsco/django-plans/badge.svg?branch=master&service=github
+   :target: https://coveralls.io/github/swappsco/django-plans?branch=master
    
 Django-plans is a pluggable app for managing pricing plans with quotas and accounts expiration. 
 Features currently supported:
