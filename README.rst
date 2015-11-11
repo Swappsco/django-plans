@@ -17,10 +17,7 @@ Features currently supported:
 
 Documentation: https://django-plans.readthedocs.org/
 
-Master branch: experimental support for django 1.6, experimental support for py2.7 & py3.3
+Support for python 2.7 and 3.3.
+We support at most 2 versions of Django at any given time: The latest LTS version and the current version. Currently support Django 1.8.
 
-.. image:: docs/source/_static/images/django-plans-1.png
-
-.. image:: docs/source/_static/images/django-plans-2.png
-
-.. image:: docs/source/_static/images/django-plans-3.png
+This project is a fork of https://github.com/cypreess/django-plans

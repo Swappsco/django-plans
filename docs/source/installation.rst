@@ -4,11 +4,11 @@ Installation
 Installing module code
 ------------------------
 
-You can install app using package manager directly from github:
+You can install with pip:
 
 .. code-block:: bash
 
-    $ pip install -e git://github.com/cypreess/django-plans.git#egg=django-plans
+    $ pip install django-plans
 
 
 For integration instruction please see section  :doc:`integration`.
@@ -22,7 +22,8 @@ Clone git repository to your current directory:
 
 .. code-block:: bash
 
-    $ git clone git://github.com/cypreess/django-plans.git
+    $ git clone git@github.com:swappsco/django-plans.git
+
 
 
 Optionally create virtual environment and get required packages to run example project:
@@ -37,14 +38,10 @@ Initialize example project database:
 
 .. code-block:: bash
 
-    $ cd ..
-    $ python manage.py syncdb
-    [...]
-    Would you like to create one now? (yes/no): no
-    [...]
+    $ python manage.py migrate
 
 
-Initial example data will be loaded automatically.
+Initial sample data will be loaded automatically.
 
 
 Start development web server:
