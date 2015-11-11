@@ -123,7 +123,7 @@ Example::
         "issuer_street": "Django street, 34",
         "issuer_zipcode": "123-3444",
         "issuer_city": "Djangoko",
-        "issuer_country": "Djangoland",
+        "issuer_country": "DJ", # Must be a country code with 2 characters
         "issuer_tax_number": "1222233334444555",
     }
 
