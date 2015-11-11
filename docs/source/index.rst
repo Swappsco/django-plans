@@ -40,7 +40,7 @@ Contributors:
 * Dominik Kozaczko <http://dominik.kozaczko.info>
 
 Source code:
-https://github.com/cypreess/django-plans
+https://github.com/Swappsco/django-plans
 
 You are very welcome to join the development team of django-plans.
 Contribution via github fork and pull requests. Here are some ideas what is needed:
