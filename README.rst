@@ -15,7 +15,7 @@ Features currently supported:
 * invoicing,
 * account expiratons + e-mail remainders.
 
-Documentation: https://django-plans.readthedocs.org/
+Documentation: https://django-plans-swapps.readthedocs.org/
 
 Support for python 2.7 and 3.3.
 We support at most 2 versions of Django at any given time: The latest LTS version and the current version. Currently support Django 1.8.
