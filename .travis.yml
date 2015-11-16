@@ -5,6 +5,9 @@ python:
 env:
   matrix:
    - DJANGO="Django<1.9"
+branches:
+  only:
+    - master
 # command to install dependencies
 install:
   - "pip install -q -e ."

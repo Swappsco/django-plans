@@ -7,8 +7,8 @@ Welcome to django-plans
 .. image:: https://coveralls.io/repos/swappsco/django-plans/badge.svg?branch=master&service=github
    :target: https://coveralls.io/github/swappsco/django-plans?branch=master
 
-.. image:: https://requires.io/github/swappsco/django-plans/requirements.svg?branch=release%2F0.8.5
-     :target: https://requires.io/github/swappsco/django-plans/requirements/?branch=release%2F0.8.5
+.. image:: https://requires.io/github/swappsco/django-plans/requirements.svg?branch=master
+     :target: https://requires.io/github/swappsco/django-plans/requirements/?branch=master
      :alt: Requirements Status
 
 .. image:: https://badge.fury.io/py/django-plans.svg

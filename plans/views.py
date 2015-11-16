@@ -202,14 +202,16 @@ class CreateOrderView(LoginRequired, CreateView):
 
         tax = self.request.session.get(tax_session_key)
         if tax is None:
-            taxation_policy = getattr(settings, 'PLANS_TAXATION_POLICY', None)
-            if not taxation_policy:
-                raise ImproperlyConfigured('PLANS_TAXATION_POLICY is not set')
-            taxation_policy = import_name(taxation_policy)
-            tax = str(taxation_policy.get_tax_rate(tax_number, country))
-            # Because taxation policy could return None which clutters with saving this value
-            # into cache, we use str() representation of this value
-            self.request.session[tax_session_key] = tax
+            tax = getattr(settings, 'PLANS_TAX', None)
+            if tax is None:
+                taxation_policy = getattr(settings, 'PLANS_TAXATION_POLICY', None)
+                if not taxation_policy:
+                    raise ImproperlyConfigured('PLANS_TAXATION_POLICY is not set')
+                taxation_policy = import_name(taxation_policy)
+                tax = str(taxation_policy.get_tax_rate(tax_number, country))
+                # Because taxation policy could return None which clutters with saving this value
+                # into cache, we use str() representation of this value
+                self.request.session[tax_session_key] = tax
 
         order.tax = Decimal(tax) if tax != 'None' else None
 
@@ -340,7 +342,6 @@ class CreateOrderPlanChangeView(CreateOrderView):
 
 class OrderView(LoginRequired, DetailView):
     model = Order
-
 
     def get_queryset(self):
         return super(OrderView, self).get_queryset().filter(user=self.request.user).select_related('plan', 'pricing', )
