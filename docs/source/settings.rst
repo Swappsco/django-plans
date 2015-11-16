@@ -232,9 +232,10 @@ Boolean value for enabling (default) or disabling the sending of plan related em
 ``PLANS_TAX``
 -------
 
-**Required**
+**Optional**
 
 Decimal or integer value for default TAX (usually referred as VAT).
+If this is setted, PLANS_TAXATION_POLICY will be ignored.
 
 Example::
 
