@@ -656,7 +656,7 @@ class ImporterTestCase(TestCase):
         import_name should be able to import a module with
         its python path
         """
-        module_name = 'exceptions.TypeError'
+        module_name = 'abc.ABCMeta'
         self.assertEqual(type(import_name(module_name)), type(TypeError))
 
 class ContribTestCase(TestCase):
