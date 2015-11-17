@@ -17,7 +17,7 @@ install:
   - pip install coverage
 
 # command to run tests
-script: "cd demo && python manage.py migrate && coverage run manage.py test plans"
+script: "coverage run manage.py test plans"
 
 after_success:
   - coveralls

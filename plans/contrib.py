@@ -4,10 +4,10 @@ from django.core import mail
 from django.core.exceptions import ImproperlyConfigured
 from django.template import loader
 from django.utils import translation
-try:
+try: # pragma: no cover
     from django.apps import apps
     cache = apps
-except (ImportError) as e:
+except (ImportError) as e: # pragma: no cover
     from django.db.models.loading import cache
 
 from plans.signals import user_language
@@ -34,22 +34,18 @@ def send_template_email(recipients, title_template, body_template, context, lang
     context.update({'site_name' : site_name, 'site_domain': domain})
 
     if language is not None:
+        original_language = translation.get_language()
         translation.activate(language)
 
     mail_title_template = loader.get_template(title_template)
     mail_body_template = loader.get_template(body_template)
     title = mail_title_template.render(context)
     body = mail_body_template.render(context)
-
-    try:
-        email_from = getattr(settings, 'DEFAULT_FROM_EMAIL')
-    except AttributeError:
-        raise ImproperlyConfigured('DEFAULT_FROM_EMAIL setting needed for sending e-mails')
-
+    email_from = getattr(settings, 'DEFAULT_FROM_EMAIL')
     mail.send_mail(title, body, email_from, recipients)
 
     if language is not None:
-        translation.deactivate()
+        translation.activate(original_language)
 
     email_logger.info(u"Email (%s) sent to %s\nTitle: %s\n%s\n\n" % (language, recipients, title, body))
 

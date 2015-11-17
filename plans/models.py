@@ -74,7 +74,7 @@ class Plan(OrderedModel):
         except IndexError:
             return None
 
-    def __str__(self):
+    def __str__(self): # pragma: no cover
         return self.name
 
     def get_quota_dict(self):
@@ -149,7 +149,7 @@ class UserPlan(models.Model):
         verbose_name = _("User plan")
         verbose_name_plural = _("Users plans")
 
-    def __str__(self):
+    def __str__(self): # pragma: no cover
         return "%s [%s]" % (self.user, self.plan)
 
     def is_active(self):
@@ -299,7 +299,7 @@ class Pricing(models.Model):
         verbose_name = _("Pricing")
         verbose_name_plural = _("Pricings")
 
-    def __str__(self):
+    def __str__(self): # pragma: no cover
         return "%s (%d " % (self.name, self.period) + "%s)" % _("days")
 
 
@@ -321,7 +321,7 @@ class Quota(OrderedModel):
         verbose_name = _("Quota")
         verbose_name_plural = _("Quotas")
 
-    def __str__(self):
+    def __str__(self): # pragma: no cover
         return "%s" % (self.codename, )
 
 
@@ -343,7 +343,7 @@ class PlanPricing(models.Model):
         verbose_name = _("Plan pricing")
         verbose_name_plural = _("Plans pricings")
 
-    def __str__(self):
+    def __str__(self): # pragma: no cover
         return "%s %s" % (self.plan.name, self.pricing)
 
 
@@ -401,7 +401,7 @@ class Order(models.Model):
             self.created = now()
         return super(Order, self).save(force_insert, force_update, using)
 
-    def __str__(self):
+    def __str__(self): # pragma: no cover
         return _("Order #%(id)d") % {'id': self.id}
 
     @property
@@ -552,7 +552,7 @@ class Invoice(models.Model):
         verbose_name = _("Invoice")
         verbose_name_plural = _("Invoices")
 
-    def __str__(self):
+    def __str__(self): # pragma: no cover
         return self.full_number
 
     def get_absolute_url(self):

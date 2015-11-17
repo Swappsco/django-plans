@@ -1,4 +1,5 @@
 from django.conf import settings
+from decimal import Decimal
 
 class TaxationPolicy(object):
     """
@@ -18,7 +19,10 @@ class TaxationPolicy(object):
 
         :return: Decimal()
         """
-        return getattr(settings, 'PLANS_TAX', None)
+        default_tax = getattr(settings, 'PLANS_TAX', None)
+        if type(default_tax) is not Decimal and default_tax is not None:
+            raise TypeError
+        return default_tax
 
     @classmethod
     def get_issuer_country_code(cls):
