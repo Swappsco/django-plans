@@ -22,6 +22,7 @@ from plans.taxation import TaxationPolicy
 from plans.taxation.eu import EUTaxationPolicy
 from plans.quota import get_user_quota
 from plans.validators import ModelCountValidator
+from plans.importer import import_name
 
 from decimal import Decimal
 User = get_user_model()
@@ -565,3 +566,16 @@ class ValidatorsTestCase(TestCase):
         #     validator_object = TestValidator()
         #     self.assertRaises(ValidationError, validator_object, user=None, quota_dict={'QUOTA_NAME': 360})
         #     self.assertEqual(validator_object(user=None, quota_dict={'QUOTA_NAME': 365}), None)
+
+class ImporterTestCase(TestCase):
+
+    def setUp(self):
+        pass
+
+    def test_import_name_imports_module_by_path(self):
+        """
+        import_name should be able to import a module with
+        its python path.
+        """
+        module_name = 'exceptions.TypeError'
+        self.assertEqual(type(import_name(module_name)), type(TypeError))
