@@ -35,6 +35,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
 )
 
 ROOT_URLCONF = 'plans.urls'
@@ -77,6 +78,7 @@ TEMPLATES = [
 
 LANGUAGES = (
     ('en', 'English'),
+    ('pt_BR', 'Portuguese'),
 )
 
 PLANS_INVOICE_ISSUER = {

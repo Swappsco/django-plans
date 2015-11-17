@@ -659,6 +659,22 @@ class ImporterTestCase(TestCase):
         module_name = 'exceptions.TypeError'
         self.assertEqual(type(import_name(module_name)), type(TypeError))
 
+class ContribTestCase(TestCase):
+
+    def setUp(self):
+        pass
+
+    def test_send_template_email_does_not_modify_language(self):
+        """
+        Language is changed inside the method, but should be restored
+        before returning or that may cause unintended side effects
+        """
+        activate('pt_BR')
+        test_lang = get_language()
+        send_template_email(['test@test.com'], 'mail/change_plan_title.txt',
+            'mail/change_plan_body.txt', {}, 'en-us')
+        self.assertEqual(test_lang, get_language())
+
 class FormsTestCase(TestCase):
     fixtures = ['initial_plan', 'test_django-plans_auth', 'test_django-plans_plans']
     def setUp(self):

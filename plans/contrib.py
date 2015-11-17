@@ -34,6 +34,7 @@ def send_template_email(recipients, title_template, body_template, context, lang
     context.update({'site_name' : site_name, 'site_domain': domain})
 
     if language is not None:
+        original_language = translation.get_language()
         translation.activate(language)
 
     mail_title_template = loader.get_template(title_template)
@@ -41,11 +42,10 @@ def send_template_email(recipients, title_template, body_template, context, lang
     title = mail_title_template.render(context)
     body = mail_body_template.render(context)
     email_from = getattr(settings, 'DEFAULT_FROM_EMAIL')
-
     mail.send_mail(title, body, email_from, recipients)
 
     if language is not None:
-        translation.deactivate()
+        translation.activate(original_language)
 
     email_logger.info(u"Email (%s) sent to %s\nTitle: %s\n%s\n\n" % (language, recipients, title, body))
 
