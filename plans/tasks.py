@@ -10,7 +10,7 @@ logger = logging.getLogger('plans.tasks')
 @periodic_task(run_every=crontab(hour=0, minute=5))
 def expire_account():
 
-	User = get_user_model()
+    User = get_user_model()
 
     logger.info('Started')
 

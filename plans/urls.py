@@ -28,7 +28,7 @@ urlpatterns = patterns(
     url(r'^invoice/(?P<pk>\d+)/preview/html/$', InvoiceDetailView.as_view(), name='invoice_preview_html'),
 )
 
-if getattr(settings, 'DEBUG', False):
+if getattr(settings, 'DEBUG', False): # pragma: no cover
     urlpatterns += (
         url(r'^fakepayments/(?P<pk>\d+)/$', FakePaymentsView.as_view(), name='fake_payments'),
     )

@@ -1,6 +1,7 @@
 from decimal import Decimal
-from datetime import date
+from datetime import date, datetime
 from datetime import timedelta
+import vatnumber
 
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.test import TestCase
@@ -9,23 +10,31 @@ from django.conf import settings
 from django.core import mail
 from django.db.models import Q
 from django.utils import six
+from django.utils.translation import get_language, activate
 
 
-if six.PY2:
+if six.PY2: # pragma: no cover
     import mock
-elif six.PY3:
+elif six.PY3: # pragma: no cover
     from unittest import mock
 
-from plans.models import PlanPricing, Invoice, Order, Plan
+from plans.models import PlanPricing, Invoice, Order, Plan, UserPlan, BillingInfo
 from plans.plan_change import PlanChangePolicy, StandardPlanChangePolicy
+from plans.taxation import TaxationPolicy
 from plans.taxation.eu import EUTaxationPolicy
 from plans.quota import get_user_quota
 from plans.validators import ModelCountValidator
+from plans.importer import import_name
+from plans.admin import UserLinkMixin
+from plans.contrib import send_template_email
+from plans.forms import BillingInfoForm
+
+from decimal import Decimal
 User = get_user_model()
 
 
 class PlansTestCase(TestCase):
-    fixtures = ['initial_plan', 'test_django-plans_auth', 'test_django-plans_plans']
+    fixtures = ['initial_test_data', 'initial_plan', 'test_django-plans_auth', 'test_django-plans_plans']
 
     def setUp(self):
         mail.outbox = []
@@ -40,6 +49,14 @@ class PlansTestCase(TestCase):
         p = u.userplan.plan
         self.assertEqual(p.get_quota_dict(),
                          {u'CUSTOM_WATERMARK': 1, u'MAX_GALLERIES_COUNT': 3, u'MAX_PHOTOS_PER_GALLERY': None})
+
+    def test_save_adds_time_now_to_created(self):
+        """
+        If created is not setted, it should be assigned now()
+        """
+        plan = Plan.objects.create(name='my_plan')
+        self.assertIsNotNone(plan.created)
+        self.assertEqual(type(plan.created), type(datetime.now()))
 
 
     def test_extend_account_same_plan_future(self):
@@ -135,6 +152,72 @@ class PlansTestCase(TestCase):
         self.assertEqual(u.userplan.active, True)
 
 
+class UserPlanTestcase(TestCase):
+    fixtures = ['initial_test_data', 'initial_plan', 'test_django-plans_auth', 'test_django-plans_plans']
+    def setUp(self):
+        self.userplan = User.objects.first().userplan # User plan which already expired
+
+    def test_userplan_is_active_returns_active(self):
+        """
+        is_active should return userplan.active
+        """
+        
+        self.assertFalse(self.userplan.active)
+        self.userplan.active = True
+        self.assertTrue(self.userplan.is_active())
+
+    def test_is_expired_returns_none_if_expire_is_none(self):
+        """
+        None represents plans with no limit, so it always return
+        false because it nevers expires
+        """
+        self.userplan.expire = None
+        self.assertFalse(self.userplan.is_expired())
+
+    def test_is_expired_returns_false_if_not_expired(self):
+        """
+        If there are still some days active, is_expired()
+        should return None
+        """
+        delta = 3
+        self.userplan.expire = datetime.now().date() + timedelta(days=delta)
+        self.assertFalse(self.userplan.is_expired())
+
+    def test_is_expired_returns_true_if_expired(self):
+        """
+        If plan is not None and has already expired, 
+        is_expired() should return True
+        """
+        delta = -3
+        self.userplan.expire = datetime.now().date() + timedelta(days=delta)
+        self.assertTrue(self.userplan.is_expired())
+
+    def test_days_left_returns_none_if_no_expiration(self):
+        """
+        If expiration is none, days left should return None
+        """
+        self.userplan.expire = None
+        self.assertIsNone(self.userplan.days_left())
+
+    def test_days_left_returns_negative_value_expired(self):
+        """
+        If plan expired already, days_left() should return
+        a negative number representing the number of days since that
+        """
+        self.assertTrue(self.userplan.days_left()<0)
+
+    def test_days_left_returns_positive_not_expired_yet(self):
+        """
+        If plan has not expired yet, days_left should return 
+        a positive number of days representing the number of days
+        left until the expiration
+        """
+        delta = 3
+        self.userplan.expire = datetime.now().date() + timedelta(days=delta)
+        self.assertEquals(delta, self.userplan.days_left())
+
+
+
 class TestInvoice(TestCase):
     fixtures = ['initial_plan', 'test_django-plans_auth', 'test_django-plans_plans']
 
@@ -190,21 +273,21 @@ class TestInvoice(TestCase):
         self.assertEqual(i.issuer_country, settings.PLANS_INVOICE_ISSUER['issuer_country'])
         self.assertEqual(i.issuer_tax_number, settings.PLANS_INVOICE_ISSUER['issuer_tax_number'])
 
-    def set_buyer_invoice_data(self):
-        i = Invoice()
-        u = User.objects.get(username='test1')
-        i.set_buyer_invoice_data(u.billinginfo)
-        self.assertEqual(i.buyer_name, u.billinginfo.name)
-        self.assertEqual(i.buyer_street, u.billinginfo.street)
-        self.assertEqual(i.buyer_zipcode, u.billinginfo.zipcode)
-        self.assertEqual(i.buyer_city, u.billinginfo.city)
-        self.assertEqual(i.buyer_country, u.billinginfo.country)
-        self.assertEqual(i.buyer_tax_number, u.billinginfo.tax_number)
-        self.assertEqual(i.buyer_name, u.billinginfo.shipping_name)
-        self.assertEqual(i.buyer_street, u.billinginfo.shipping_street)
-        self.assertEqual(i.buyer_zipcode, u.billinginfo.shipping_zipcode)
-        self.assertEqual(i.buyer_city, u.billinginfo.shipping_city)
-        self.assertEqual(i.buyer_country, u.billinginfo.shipping_country)
+    # def test_set_buyer_invoice_data(self):
+    #     i = Invoice()
+    #     u = User.objects.get(username='test1')
+    #     i.set_buyer_invoice_data(u.billinginfo)
+    #     self.assertEqual(i.buyer_name, u.billinginfo.name)
+    #     self.assertEqual(i.buyer_street, u.billinginfo.street)
+    #     self.assertEqual(i.buyer_zipcode, u.billinginfo.zipcode)
+    #     self.assertEqual(i.buyer_city, u.billinginfo.city)
+    #     self.assertEqual(i.buyer_country, u.billinginfo.country)
+    #     self.assertEqual(i.buyer_tax_number, u.billinginfo.tax_number)
+    #     self.assertEqual(i.buyer_name, u.billinginfo.shipping_name)
+    #     self.assertEqual(i.buyer_street, u.billinginfo.shipping_street)
+    #     self.assertEqual(i.buyer_zipcode, u.billinginfo.shipping_zipcode)
+    #     self.assertEqual(i.buyer_city, u.billinginfo.shipping_city)
+    #     self.assertEqual(i.buyer_country, u.billinginfo.shipping_country)
 
     def test_invoice_number(self):
         settings.PLANS_INVOICE_NUMBER_FORMAT = "{{ invoice.number }}/{% ifequal " \
@@ -457,6 +540,39 @@ class StandardPlanChangePolicyTestCase(TestCase):
         self.assertEqual(self.policy.get_change_price(p1, p2, 23), Decimal('8.60'))
         self.assertEqual(self.policy.get_change_price(p2, p1, 23), None)
 
+class TaxationPolicyTestCase(TestCase):
+
+    def setUp(self):
+        self.taxation_policy = TaxationPolicy()
+
+    def test_taxation_policy_returns_plans_tax_or_none(self):
+        """
+        PLANS_TAX should be returned if it exists, otherwise None should
+        be returned
+        """
+        tax_value = Decimal(15.0)
+        with self.settings(PLANS_TAX=tax_value):
+            self.assertEquals(tax_value, self.taxation_policy.get_default_tax())
+        with self.settings(PLANS_TAX=None):
+            self.assertEquals(None, self.taxation_policy.get_default_tax())
+
+    def test_taxation_policy_raise_error_default_is_not_decimal(self):
+        """
+        If PLANS_TAX is not a decimal or None, then a ValueError should be
+        raised by the application.
+        """
+        with self.settings(PLANS_TAX=''):
+            self.assertRaises(TypeError, self.taxation_policy.get_default_tax)
+
+    def test_get_tax_rate_raises_not_implemented(self):
+        """
+        This method should be overriden by children. Should raise
+        NotImplementedError exception by default
+        """
+        with self.assertRaises(NotImplementedError):
+            self.taxation_policy.get_tax_rate('tax_id', 'country_code')
+                
+
 
 class EUTaxationPolicyTestCase(TestCase):
     def setUp(self):
@@ -498,6 +614,7 @@ class EUTaxationPolicyTestCase(TestCase):
 
 
 class ValidatorsTestCase(TestCase):
+    fixtures = ['initial_plan', 'test_django-plans_auth', 'test_django-plans_plans']
     def test_model_count_validator(self):
         """
         We create a test model validator for User. It will raise ValidationError when QUOTA_NAME value
@@ -528,3 +645,58 @@ class ValidatorsTestCase(TestCase):
         #     validator_object = TestValidator()
         #     self.assertRaises(ValidationError, validator_object, user=None, quota_dict={'QUOTA_NAME': 360})
         #     self.assertEqual(validator_object(user=None, quota_dict={'QUOTA_NAME': 365}), None)
+
+class ImporterTestCase(TestCase):
+
+    def setUp(self):
+        pass
+
+    def test_import_name_imports_module_by_path(self):
+        """
+        import_name should be able to import a module with
+        its python path
+        """
+        module_name = 'exceptions.TypeError'
+        self.assertEqual(type(import_name(module_name)), type(TypeError))
+
+class ContribTestCase(TestCase):
+
+    def setUp(self):
+        pass
+
+    def test_send_template_email_does_not_modify_language(self):
+        """
+        Language is changed inside the method, but should be restored
+        before returning or that may cause unintended side effects
+        """
+        activate('pt_BR')
+        test_lang = get_language()
+        send_template_email(['test@test.com'], 'mail/change_plan_title.txt',
+            'mail/change_plan_body.txt', {}, 'en-us')
+        self.assertEqual(test_lang, get_language())
+
+class FormsTestCase(TestCase):
+    fixtures = ['initial_plan', 'test_django-plans_auth', 'test_django-plans_plans']
+    def setUp(self):
+        pass
+
+    def test_form_clean_raises_error_on_invalid_tax(self):
+        """
+        BillingInfo form should allow only valid tax numbers.
+        Form should return the error if it is not
+        """
+        billing_info = BillingInfo.objects.first()
+        country = vatnumber.countries()[0]
+        data = {
+            'user': billing_info.user,
+            'country': country,
+            'street': billing_info.street,
+            'name': billing_info.name,
+            'zipcode': billing_info.zipcode,
+            'city': billing_info.city,
+            'tax_number': country+billing_info.tax_number,
+        }
+        form = BillingInfoForm(data=data)
+        self.assertFalse(form.is_valid())
+        self.assertEqual(len(form.errors), 1)
+        
