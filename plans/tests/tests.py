@@ -1,5 +1,5 @@
 from decimal import Decimal
-from datetime import date
+from datetime import date, datetime
 from datetime import timedelta
 
 from django.core.exceptions import ImproperlyConfigured, ValidationError
@@ -16,7 +16,7 @@ if six.PY2: # pragma: no cover
 elif six.PY3: # pragma: no cover
     from unittest import mock
 
-from plans.models import PlanPricing, Invoice, Order, Plan
+from plans.models import PlanPricing, Invoice, Order, Plan, UserPlan
 from plans.plan_change import PlanChangePolicy, StandardPlanChangePolicy
 from plans.taxation import TaxationPolicy
 from plans.taxation.eu import EUTaxationPolicy
@@ -44,6 +44,14 @@ class PlansTestCase(TestCase):
         p = u.userplan.plan
         self.assertEqual(p.get_quota_dict(),
                          {u'CUSTOM_WATERMARK': 1, u'MAX_GALLERIES_COUNT': 3, u'MAX_PHOTOS_PER_GALLERY': None})
+
+    def test_save_adds_time_now_to_created(self):
+        """
+        If created is not setted, it should be assigned now()
+        """
+        plan = Plan.objects.create(name='my_plan')
+        self.assertIsNotNone(plan.created)
+        self.assertEqual(type(plan.created), type(datetime.now()))
 
 
     def test_extend_account_same_plan_future(self):
@@ -137,6 +145,72 @@ class PlansTestCase(TestCase):
         self.assertEquals(u.userplan.plan, plan)
         self.assertIsNone(u.userplan.expire)
         self.assertEqual(u.userplan.active, True)
+
+
+class UserPlanTestcase(TestCase):
+    fixtures = ['initial_test_data', 'initial_plan', 'test_django-plans_auth', 'test_django-plans_plans']
+    def setUp(self):
+        self.userplan = User.objects.first().userplan # User plan which already expired
+
+    def test_userplan_is_active_returns_active(self):
+        """
+        is_active should return userplan.active
+        """
+        
+        self.assertFalse(self.userplan.active)
+        self.userplan.active = True
+        self.assertTrue(self.userplan.is_active())
+
+    def test_is_expired_returns_none_if_expire_is_none(self):
+        """
+        None represents plans with no limit, so it always return
+        false because it nevers expires
+        """
+        self.userplan.expire = None
+        self.assertFalse(self.userplan.is_expired())
+
+    def test_is_expired_returns_false_if_not_expired(self):
+        """
+        If there are still some days active, is_expired()
+        should return None
+        """
+        delta = 3
+        self.userplan.expire = datetime.now().date() + timedelta(days=delta)
+        self.assertFalse(self.userplan.is_expired())
+
+    def test_is_expired_returns_true_if_expired(self):
+        """
+        If plan is not None and has already expired, 
+        is_expired() should return True
+        """
+        delta = -3
+        self.userplan.expire = datetime.now().date() + timedelta(days=delta)
+        self.assertTrue(self.userplan.is_expired())
+        
+    def test_days_left_returns_none_if_no_expiration(self):
+        """
+        If expiration is none, days left should return None
+        """
+        self.userplan.expire = None
+        self.assertIsNone(self.userplan.days_left())
+
+    def test_days_left_returns_negative_value_expired(self):
+        """
+        If plan expired already, days_left() should return
+        a negative number representing the number of days since that
+        """
+        self.assertTrue(self.userplan.days_left()<0)
+
+    def test_days_left_returns_positive_not_expired_yet(self):
+        """
+        If plan has not expired yet, days_left should return 
+        a positive number of days representing the number of days
+        left until the expiration
+        """
+        delta = 3
+        self.userplan.expire = datetime.now().date() + timedelta(days=delta)
+        self.assertEquals(delta, self.userplan.days_left())
+
 
 
 class TestInvoice(TestCase):
