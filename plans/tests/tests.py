@@ -659,11 +659,6 @@ class ImporterTestCase(TestCase):
         module_name = 'exceptions.TypeError'
         self.assertEqual(type(import_name(module_name)), type(TypeError))
 
-class ContribTestCase(TestCase):
-
-    def setUp(self):
-        pass
-
 class FormsTestCase(TestCase):
     fixtures = ['initial_plan', 'test_django-plans_auth', 'test_django-plans_plans']
     def setUp(self):
