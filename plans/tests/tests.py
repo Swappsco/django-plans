@@ -25,7 +25,7 @@ User = get_user_model()
 
 
 class PlansTestCase(TestCase):
-    fixtures = ['initial_plan', 'test_django-plans_auth', 'test_django-plans_plans']
+    fixtures = ['initial_test_data', 'initial_plan', 'test_django-plans_auth', 'test_django-plans_plans']
 
     def setUp(self):
         mail.outbox = []
@@ -498,6 +498,7 @@ class EUTaxationPolicyTestCase(TestCase):
 
 
 class ValidatorsTestCase(TestCase):
+    fixtures = ['initial_plan', 'test_django-plans_auth', 'test_django-plans_plans']
     def test_model_count_validator(self):
         """
         We create a test model validator for User. It will raise ValidationError when QUOTA_NAME value

@@ -1,7 +1,7 @@
 # Django settings for example project.
 import os
 from decimal import Decimal
-
+DEBUG = True
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -27,12 +27,6 @@ STATIC_URL = '/static/'
 
 
 SECRET_KEY = 'l#^#iad$8$4=dlh74$!xs=3g4jb(&j+y6*ozy&8k1-&d+vruzy'
-
-TEMPLATE_LOADERS = (
-    'django.template.loaders.filesystem.Loader',
-    'django.template.loaders.app_directories.Loader',
-    #     'django.template.loaders.eggs.Loader',
-)
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -98,9 +92,7 @@ PLANS_TAX = Decimal('23.0')
 PLANS_TAXATION_POLICY = 'plans.taxation.eu.EUTaxationPolicy'
 PLANS_TAX_COUNTRY = 'PL'
 
-PLANS_VALIDATORS = {
-    'MAX_FOO_COUNT': 'example.foo.validators.max_foos_validator',
-}
+PLANS_VALIDATORS = {}
 
 PLANS_CURRENCY = 'EUR'
 
