@@ -15,8 +15,7 @@ from django.views.generic.list import ListView
 
 from itertools import chain
 from plans.importer import import_name
-#from plans.mixins import LoginRequired
-from braces.views import LoginRequiredMixin
+from plans.mixins import LoginRequired
 from plans.models import UserPlan, PlanPricing, Plan, Order, BillingInfo
 from plans.forms import CreateOrderForm, BillingInfoForm, FakePaymentsForm
 from plans.models import Quota, Invoice
