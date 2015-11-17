@@ -11,16 +11,19 @@ from django.db.models import Q
 from django.utils import six
 
 
-if six.PY2:
+if six.PY2: # pragma: no cover
     import mock
-elif six.PY3:
+elif six.PY3: # pragma: no cover
     from unittest import mock
 
 from plans.models import PlanPricing, Invoice, Order, Plan
 from plans.plan_change import PlanChangePolicy, StandardPlanChangePolicy
+from plans.taxation import TaxationPolicy
 from plans.taxation.eu import EUTaxationPolicy
 from plans.quota import get_user_quota
 from plans.validators import ModelCountValidator
+
+from decimal import Decimal
 User = get_user_model()
 
 
@@ -190,21 +193,21 @@ class TestInvoice(TestCase):
         self.assertEqual(i.issuer_country, settings.PLANS_INVOICE_ISSUER['issuer_country'])
         self.assertEqual(i.issuer_tax_number, settings.PLANS_INVOICE_ISSUER['issuer_tax_number'])
 
-    def set_buyer_invoice_data(self):
-        i = Invoice()
-        u = User.objects.get(username='test1')
-        i.set_buyer_invoice_data(u.billinginfo)
-        self.assertEqual(i.buyer_name, u.billinginfo.name)
-        self.assertEqual(i.buyer_street, u.billinginfo.street)
-        self.assertEqual(i.buyer_zipcode, u.billinginfo.zipcode)
-        self.assertEqual(i.buyer_city, u.billinginfo.city)
-        self.assertEqual(i.buyer_country, u.billinginfo.country)
-        self.assertEqual(i.buyer_tax_number, u.billinginfo.tax_number)
-        self.assertEqual(i.buyer_name, u.billinginfo.shipping_name)
-        self.assertEqual(i.buyer_street, u.billinginfo.shipping_street)
-        self.assertEqual(i.buyer_zipcode, u.billinginfo.shipping_zipcode)
-        self.assertEqual(i.buyer_city, u.billinginfo.shipping_city)
-        self.assertEqual(i.buyer_country, u.billinginfo.shipping_country)
+    # def test_set_buyer_invoice_data(self):
+    #     i = Invoice()
+    #     u = User.objects.get(username='test1')
+    #     i.set_buyer_invoice_data(u.billinginfo)
+    #     self.assertEqual(i.buyer_name, u.billinginfo.name)
+    #     self.assertEqual(i.buyer_street, u.billinginfo.street)
+    #     self.assertEqual(i.buyer_zipcode, u.billinginfo.zipcode)
+    #     self.assertEqual(i.buyer_city, u.billinginfo.city)
+    #     self.assertEqual(i.buyer_country, u.billinginfo.country)
+    #     self.assertEqual(i.buyer_tax_number, u.billinginfo.tax_number)
+    #     self.assertEqual(i.buyer_name, u.billinginfo.shipping_name)
+    #     self.assertEqual(i.buyer_street, u.billinginfo.shipping_street)
+    #     self.assertEqual(i.buyer_zipcode, u.billinginfo.shipping_zipcode)
+    #     self.assertEqual(i.buyer_city, u.billinginfo.shipping_city)
+    #     self.assertEqual(i.buyer_country, u.billinginfo.shipping_country)
 
     def test_invoice_number(self):
         settings.PLANS_INVOICE_NUMBER_FORMAT = "{{ invoice.number }}/{% ifequal " \
@@ -456,6 +459,39 @@ class StandardPlanChangePolicyTestCase(TestCase):
         p2 = Plan.objects.get(pk=4)
         self.assertEqual(self.policy.get_change_price(p1, p2, 23), Decimal('8.60'))
         self.assertEqual(self.policy.get_change_price(p2, p1, 23), None)
+
+class TaxationPolicyTestCase(TestCase):
+
+    def setUp(self):
+        self.taxation_policy = TaxationPolicy()
+
+    def test_taxation_policy_returns_plans_tax_or_none(self):
+        """
+        PLANS_TAX should be returned if it exists, otherwise None should
+        be returned
+        """
+        tax_value = Decimal(15.0)
+        with self.settings(PLANS_TAX=tax_value):
+            self.assertEquals(tax_value, self.taxation_policy.get_default_tax())
+        with self.settings(PLANS_TAX=None):
+            self.assertEquals(None, self.taxation_policy.get_default_tax())
+
+    def test_taxation_policy_raise_error_default_is_not_decimal(self):
+        """
+        If PLANS_TAX is not a decimal or None, then a ValueError should be
+        raised by the application.
+        """
+        with self.settings(PLANS_TAX=''):
+            self.assertRaises(TypeError, self.taxation_policy.get_default_tax)
+
+    def test_get_tax_rate_raises_not_implemented(self):
+        """
+        This method should be overriden by children. Should raise
+        NotImplementedError exception by default
+        """
+        with self.assertRaises(NotImplementedError):
+            self.taxation_policy.get_tax_rate('tax_id', 'country_code')
+                
 
 
 class EUTaxationPolicyTestCase(TestCase):
