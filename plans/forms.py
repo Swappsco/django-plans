@@ -31,12 +31,8 @@ class BillingInfoForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super(BillingInfoForm, self).clean()
-
-        try:
-            cleaned_data['tax_number'] = BillingInfo.clean_tax_number(cleaned_data['tax_number'],
+        cleaned_data['tax_number'] = BillingInfo.clean_tax_number(cleaned_data['tax_number'],
                                                                       cleaned_data.get('country', None))
-        except ValidationError as e:
-            self._errors['tax_number'] = e.messages
 
         return cleaned_data
 

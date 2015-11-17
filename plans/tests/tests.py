@@ -1,6 +1,7 @@
 from decimal import Decimal
 from datetime import date, datetime
 from datetime import timedelta
+import vatnumber
 
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.test import TestCase
@@ -9,6 +10,7 @@ from django.conf import settings
 from django.core import mail
 from django.db.models import Q
 from django.utils import six
+from django.utils.translation import get_language, activate
 
 
 if six.PY2: # pragma: no cover
@@ -16,13 +18,16 @@ if six.PY2: # pragma: no cover
 elif six.PY3: # pragma: no cover
     from unittest import mock
 
-from plans.models import PlanPricing, Invoice, Order, Plan, UserPlan
+from plans.models import PlanPricing, Invoice, Order, Plan, UserPlan, BillingInfo
 from plans.plan_change import PlanChangePolicy, StandardPlanChangePolicy
 from plans.taxation import TaxationPolicy
 from plans.taxation.eu import EUTaxationPolicy
 from plans.quota import get_user_quota
 from plans.validators import ModelCountValidator
 from plans.importer import import_name
+from plans.admin import UserLinkMixin
+from plans.contrib import send_template_email
+from plans.forms import BillingInfoForm
 
 from decimal import Decimal
 User = get_user_model()
@@ -186,7 +191,7 @@ class UserPlanTestcase(TestCase):
         delta = -3
         self.userplan.expire = datetime.now().date() + timedelta(days=delta)
         self.assertTrue(self.userplan.is_expired())
-        
+
     def test_days_left_returns_none_if_no_expiration(self):
         """
         If expiration is none, days left should return None
@@ -649,7 +654,38 @@ class ImporterTestCase(TestCase):
     def test_import_name_imports_module_by_path(self):
         """
         import_name should be able to import a module with
-        its python path.
+        its python path
         """
         module_name = 'exceptions.TypeError'
         self.assertEqual(type(import_name(module_name)), type(TypeError))
+
+class ContribTestCase(TestCase):
+
+    def setUp(self):
+        pass
+
+class FormsTestCase(TestCase):
+    fixtures = ['initial_plan', 'test_django-plans_auth', 'test_django-plans_plans']
+    def setUp(self):
+        pass
+
+    def test_form_clean_raises_error_on_invalid_tax(self):
+        """
+        BillingInfo form should allow only valid tax numbers.
+        Form should return the error if it is not
+        """
+        billing_info = BillingInfo.objects.first()
+        country = vatnumber.countries()[0]
+        data = {
+            'user': billing_info.user,
+            'country': country,
+            'street': billing_info.street,
+            'name': billing_info.name,
+            'zipcode': billing_info.zipcode,
+            'city': billing_info.city,
+            'tax_number': country+billing_info.tax_number,
+        }
+        form = BillingInfoForm(data=data)
+        self.assertFalse(form.is_valid())
+        self.assertEqual(len(form.errors), 1)
+        
