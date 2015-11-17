@@ -12,7 +12,7 @@ setup(
     long_description=long_description,
     author='Krzysztof Dorosz',
     author_email='dev@swapps.co',
-    url='https://github.com/Swappsco/django-plans',
+    url='https://github.com/swappsco/django-plans',
     license='MIT',
 
     packages=find_packages(),
