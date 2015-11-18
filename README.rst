@@ -13,13 +13,17 @@ Welcome to django-plans
 
 .. image:: https://badge.fury.io/py/django-plans.svg
     :target: https://badge.fury.io/py/django-plans
+
+.. image:: https://readthedocs.org/projects/django-plans-swapps/badge/?version=latest
+	:target: http://django-plans-swapps.readthedocs.org/en/latest/?badge=latest
+	:alt: Documentation Status
    
 Django-plans is a pluggable app for managing pricing plans with quotas and accounts expiration. 
 Features currently supported:
 
 * multiple plans,
 * support for user custom plans,
-* flexible model for parametrizing plans (quota),
+* flexible model for parameterizing plans (quota),
 * customizable billing periods (plan pricing),
 * order total calculation using customizable taxation policy (e.g. in EU calculating VAT based on seller/buyer countries and VIES)
 * invoicing,
