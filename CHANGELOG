@@ -3,6 +3,19 @@ django-plans changelog
 
 0.8
 ---
+* Release version 0.8.6
+  * Made PLANS_TAX optional
+* Release version 0.8.5
+  * Add requires.io badge and badge.fury.io badge
+  * Add coveralls badge
+  * Add coveralls to travis.yml
+  * Update repository links
+  * Bump version
+  * Update code to support case where there is no current plan
+  * Update admin to avoid errors
+  * Fix sample project and tests
+  * When there is no default plan, a userplan object with no plan is allowed
+  * Bump version for pypi
 * Release version 0.8.4
   * Add rtd link to docs
 * Release version 0.8.3
