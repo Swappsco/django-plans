@@ -1,6 +1,24 @@
 django-plans changelog
 ======================
 
+0.8
+---
+* Release version 0.8.0
+* Update project to support Django 1.8
+  * Update badge system
+  * Ignore django 1.9 warnings for now
+  * Remove python from shebang on manage.py
+  * Update settings to follow current django structure
+  * Fix issues with django version
+  * Update travis.yml
+  * bump version on setup.py
+  * Leave support for django1.6.
+  * Update demo project to use data migrations instead of loaddata
+  * Fix incorrect upgrade of django.db.models.loading
+  * Remove django deprecation warnings
+  * Update demo project to run django1.8 migrations
+  * Merge branch 'free-plan-support' of github.com:kiratalent/django-plans
+
 0.7
 ---
 * Changes in plans.taxation.eu.EUTaxationPolicy to implement new EU VAT regulations (MOSS)
@@ -19,8 +37,6 @@ django-plans changelog
   * Renamed settings variable name INVOICE_COUNTER_RESET to PLANS_INVOICE_COUNTER_RESET
   * Renamed settings variable name ORDER_EXPIRATION to PLANS_ORDER_EXPIRATION
   * Renamed settings variable name PLAN_DEFAULT_GRACE_PERIOD to PLANS_DEFAULT_GRACE_PERIOD
-
-
 
 0.6+
 ----
