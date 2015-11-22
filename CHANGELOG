@@ -3,6 +3,11 @@ django-plans changelog
 
 0.8
 ---
+* Release version 0.8.8
+  * Updated the CHANGELOG file to include a record of the different updates, fixes and modifications
+  made to the project since the 0.7 version, where the original project was abandoned.
+  * Updating the AUTHORS file to include the actual maintainer, also to include collaborators into
+  the same file, because there weren't a file inside the original project to include them.
 * Release version 0.8.7
   * Merge branch 'feature/improve-coverage' into develop
   * Add tests for contrib
