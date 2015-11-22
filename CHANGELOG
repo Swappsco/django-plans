@@ -3,6 +3,19 @@ django-plans changelog
 
 0.8
 ---
+* Release version 0.8.7
+  * Merge branch 'feature/improve-coverage' into develop
+  * Add tests for contrib
+  * Add test for VAT validation
+  * Add test for VAT validation
+  * Add tests for plans and userplans models
+  * Add test for importer.py
+  * Add tests for TaxationPolicy
+  * Add .coveragerc to get coverage only for django-plans files
+  * Refactor project to pass tests using fixtures. Should replace
+  * Add files to run tests for plan directly, instead of running
+  * Revert change
+  * Replace access mixin for braces
 * Release version 0.8.6
   * Made PLANS_TAX optional
 * Release version 0.8.5
