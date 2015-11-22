@@ -3,6 +3,14 @@ django-plans changelog
 
 0.8
 ---
+* Release version 0.8.4
+  * Add rtd link to docs
+* Release version 0.8.3
+  * Remove django settings from docs build
+  * Update conf.py
+  * Comment out conf.py
+  * Remove img from docs
+  * Update doc
 * Release version 0.8.2
   * Fix broken migration
   * Bump version. Update travis.yml to include migrations
