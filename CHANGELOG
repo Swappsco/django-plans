@@ -3,6 +3,11 @@ django-plans changelog
 
 0.8
 ---
+* Release version 0.8.2
+  * Fix broken migration
+  * Bump version. Update travis.yml to include migrations
+* Release version 0.8.1
+  * Add migrations to project
 * Release version 0.8.0
 * Update project to support Django 1.8
   * Update badge system
