@@ -4,7 +4,8 @@ from datetime import timedelta
 import vatnumber
 
 from django.core.exceptions import ImproperlyConfigured, ValidationError
-from django.test import TestCase
+from django.core.urlresolvers import reverse
+from django.test import TestCase, Client
 from django.contrib.auth import get_user_model
 from django.conf import settings
 from django.core import mail
@@ -700,3 +701,24 @@ class FormsTestCase(TestCase):
         self.assertFalse(form.is_valid())
         self.assertEqual(len(form.errors), 1)
         
+class ViewsTestCase(TestCase):
+    fixtures = ['initial_plan', 'test_django-plans_auth', 'test_django-plans_plans']
+    
+    def setUp(self):
+        self.client = Client()
+        self.user = User.objects.create_superuser(
+            username='test', email='test@test.com', password='top_secret')
+        self.client.login(username=self.user.username, password='top_secret')
+        
+    def test_invoice_returns_html_if_not_wkhtmltopdf(self):
+        """
+        If wkhtmltopf is not installed, the invoice detail view
+        should return the invoice as html
+        """
+        response = self.client.get(reverse('invoice_preview', 
+            args=[Invoice.objects.first().pk]))
+        self.assertTrue('Content-Type: text/html' in response.serialize_headers())
+        self.assertEqual(response.status_code, 200)
+        
+    
+    

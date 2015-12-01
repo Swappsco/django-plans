@@ -24,8 +24,6 @@ from plans.signals import order_started
 from plans.validators import plan_validation
 
 
-
-
 class AccountActivationView(LoginRequired, TemplateView):
     template_name = 'plans/account_activation.html'
 
@@ -477,7 +475,7 @@ class InvoiceDetailView(LoginRequired, DetailView):
             
     def get(self, request, pk):
         response = HttpResponse(content_type='application/pdf')
-        response['Content-Disposition'] = 'filename="invoice%s.pdf"' % (pk)
+        response['Content-Disposition'] = 'filename="invoice-%s.pdf"' % (pk)
         invoice = super(InvoiceDetailView, self).get(request, pk)
         invoice.render()
         try:
