@@ -6,15 +6,19 @@ from django.core import urlresolvers
 from ordered_model.admin import OrderedModelAdmin
 from django.utils.translation import ugettext_lazy as _
 
-from .models import UserPlan, Plan, PlanQuota, Quota, PlanPricing, Pricing, Order, BillingInfo
+from .models import (UserPlan, Plan, PlanQuota, Quota, PlanPricing,
+                     Pricing, Order, BillingInfo)
 from plans.models import Invoice
 
 
 class UserLinkMixin(object):
     def user_link(self, obj):
-        change_url = urlresolvers.reverse('admin:%s_%s_change' % 
-            (obj.user._meta.app_label, obj.user._meta.model_name), args=(obj.user.id,))
-        return '<a href="%s">%s</a>' % (change_url, obj.user.get_username())
+        change_url = urlresolvers.reverse(
+            'admin:{0}_{1}_change'.format(obj.user._meta.app_label,
+                                          obj.user._meta.model_name),
+            args=(obj.user.id,))
+        return '<a href="{0}">{1}</a>'.format(change_url,
+                                              obj.user.get_username())
 
     user_link.short_description = 'User'
     user_link.allow_tags = True
@@ -29,7 +33,8 @@ class PlanPricingInline(admin.TabularInline):
 
 
 class QuotaAdmin(OrderedModelAdmin):
-    list_display = ('codename', 'name', 'description', 'unit', 'is_boolean', 'move_up_down_links', )
+    list_display = ('codename', 'name', 'description', 'unit',
+                    'is_boolean', 'move_up_down_links', )
 
 
 def copy_plan(modeladmin, request, queryset):
@@ -62,14 +67,16 @@ class PlanAdmin(OrderedModelAdmin):
 
     search_fields = ('name', 'customized__username', 'customized__email', )
     list_filter = ('available', 'visible')
-    list_display = ('name', 'description', 'customized', 'default', 'available', 'created', 'move_up_down_links')
+    list_display = ('name', 'description', 'customized', 'default',
+                    'available', 'created', 'move_up_down_links')
     inlines = (PlanPricingInline, PlanQuotaInline)
     list_select_related = True
     raw_id_fields = ('customized',)
     actions = [copy_plan, ]
 
     def queryset(self, request):
-        return super(PlanAdmin, self).queryset(request).select_related('customized')
+        return super(PlanAdmin, self).queryset(request).select_related(
+            'customized')
 
 
 class BillingInfoAdmin(UserLinkMixin, admin.ModelAdmin):
@@ -87,11 +94,14 @@ class BillingInfoAdmin(UserLinkMixin, admin.ModelAdmin):
         _email_field = None
 
     if _email_field:
-        search_fields = ('user__{0}'.format(_username_field), 'user__email', 'tax_number', 'name')
+        search_fields = ('user__{0}'.format(_username_field),
+                         'user__email', 'tax_number', 'name')
     else:
-        search_fields = ('user__{0}'.format(_username_field), 'tax_number', 'name')
+        search_fields = ('user__{0}'.format(_username_field),
+                         'tax_number', 'name')
 
-    list_display = ('user', 'tax_number', 'name', 'street', 'zipcode', 'city', 'country')
+    list_display = ('user', 'tax_number', 'name', 'street',
+                    'zipcode', 'city', 'country')
     list_select_related = True
     readonly_fields = ('user_link',)
     exclude = ('user',)
@@ -107,7 +117,8 @@ make_order_completed.short_description = _('Make selected orders completed')
 
 def make_order_invoice(modeladmin, request, queryset):
     for order in queryset:
-        if Invoice.objects.filter(type=Invoice.INVOICE_TYPES['INVOICE'], order=order).count() == 0:
+        if Invoice.objects.filter(type=Invoice.INVOICE_TYPES['INVOICE'],
+                                  order=order).count() == 0:
             Invoice.create(order, Invoice.INVOICE_TYPES['INVOICE'])
 
 
@@ -137,24 +148,27 @@ class OrderAdmin(admin.ModelAdmin):
     raw_id_fields = ('user',)
 
     if _email_field:
-        search_fields = ('id', 'user__{0}'.format(_username_field), 'user__email')
+        search_fields = ('id', 'user__{0}'.format(_username_field),
+                         'user__email')
     else:
         search_fields = ('id', 'user__{0}'.format(_username_field))
 
-    list_display = (
-        'id', 'name', 'created', 'user', 'status', 'completed', 'tax', 'amount', 'currency', 'plan', 'pricing')
+    list_display = ('id', 'name', 'created', 'user', 'status', 'completed',
+                    'tax', 'amount', 'currency', 'plan', 'pricing')
     actions = [make_order_completed, make_order_invoice]
     inlines = (InvoiceInline, )
 
     def queryset(self, request):
-        return super(OrderAdmin, self).queryset(request).select_related('plan', 'pricing', 'user')
+        return super(OrderAdmin, self).queryset(request).select_related(
+            'plan', 'pricing', 'user')
 
 
 class InvoiceAdmin(admin.ModelAdmin):
-    search_fields = ('full_number', 'buyer_tax_number', 'user__username', 'user__email')
+    search_fields = ('full_number', 'buyer_tax_number',
+                     'user__username', 'user__email')
     list_filter = ('type', 'issued')
-    list_display = (
-        'full_number', 'issued', 'total_net', 'currency', 'user', 'tax', 'buyer_name', 'buyer_city', 'buyer_tax_number')
+    list_display = ('full_number', 'issued', 'total_net', 'currency', 'user',
+                    'tax', 'buyer_name', 'buyer_city', 'buyer_tax_number')
     list_select_related = True
     raw_id_fields = ('user', 'order')
 
@@ -173,17 +187,19 @@ class UserPlanAdmin(UserLinkMixin, admin.ModelAdmin):
     except:
         _email_field = None
 
-    list_filter = ('active', 'expire', 'plan__name', 'plan__available', 'plan__visible',)
+    list_filter = ('active', 'expire', 'plan__name',
+                   'plan__available', 'plan__visible',)
 
     if _email_field:
-        search_fields = ('user__{0}'.format(_username_field), 'user__email', 'plan__name',)
+        search_fields = ('user__{0}'.format(_username_field),
+                         'user__email', 'plan__name',)
     else:
         search_fields = ('user__{0}'.format(_username_field), 'plan__name',)
 
     list_display = ('user', 'plan', 'expire', 'active')
     list_select_related = True
     readonly_fields = ['user_link', ]
-    fields = ('user_link', 'plan', 'expire', 'active' )
+    fields = ('user_link', 'plan', 'expire', 'active')
     raw_id_fields = ['plan', ]
 
 
@@ -194,5 +210,3 @@ admin.site.register(Pricing)
 admin.site.register(Order, OrderAdmin)
 admin.site.register(BillingInfo, BillingInfoAdmin)
 admin.site.register(Invoice, InvoiceAdmin)
-
-

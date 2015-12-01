@@ -7,7 +7,7 @@ django-extensions
 mock
 tox
 suds-jurko
-
+pdfkit>=0.5.0
 
 # Not supported in py3
 #fabric

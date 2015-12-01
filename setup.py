@@ -7,12 +7,12 @@ with open('README.rst') as file:
 
 setup(
     name='django-plans',
-    version='0.8.7',
+    version='0.8.8',
     description='Pluggable django app for managing pricing plans with quotas and accounts expiration',
     long_description=long_description,
     author='Krzysztof Dorosz',
     author_email='dev@swapps.co',
-    url='https://github.com/Swappsco/django-plans',
+    url='https://github.com/swappsco/django-plans',
     license='MIT',
 
     packages=find_packages(),
@@ -34,6 +34,7 @@ setup(
         'celery',
         'suds-jurko',
         'six',
+        'pdfkit>=0.5.0',
     ],
     extras_require={
         'i18n': [

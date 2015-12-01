@@ -5,7 +5,7 @@ There is a built in support for creating invoices. This functionality brings pow
   * invoices are linked to orders,
   * invoices can have different shipping info,
   * invoices can be marked as "requiring shipment"
-  * invoices can be previewed as HTML or PDF
+  * invoices can be previewed as HTML or PDF (depends on wkhtmltopdf)
 
 Changing values of VAT tax and PLANS_INVOICE_ISSUER in a living system
 ----------------------------------------------------------------------

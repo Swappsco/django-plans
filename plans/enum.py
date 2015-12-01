@@ -50,7 +50,7 @@ class Enumeration(object):
         return self.enum_list.__iter__()
 
     def __repr__(self):
-        return 'Enum(%s)' % self.enum_list_full.__repr__()
+        return 'Enum({0})'.format(self.enum_list_full.__repr__())
 
     def get_display_name(self, v):
         return self.enum_display[v]

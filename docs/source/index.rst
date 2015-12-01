@@ -32,12 +32,14 @@ Developing
 
 Project leader:
 
-* Krzysztof Dorosz <cypreess@gmail.com>
+* Cristian Vargas <@cdvv>
 
 Contributors:
 
 * Victor Safronovich <vsafronovich@gmail.com>
 * Dominik Kozaczko <http://dominik.kozaczko.info>
+* Krzysztof Dorosz <cypreess@gmail.com>
+* Sebastian Reyes <@sebastian-code>
 
 Source code:
 https://github.com/swappsco/django-plans
@@ -66,4 +68,4 @@ Contribution via github fork and pull requests. Here are some ideas what is need
     * Bugfixes in django-plans itself.
     * Features in django-plans itself.
 
-    If you're interested, please contact Krzysztof Dorosz <cypreess@gmail.com>.
+    If you're interested, please contact Cristian Vargas initially through GitHub account <@cdvv>.

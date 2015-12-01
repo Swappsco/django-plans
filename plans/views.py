@@ -1,5 +1,5 @@
 from decimal import Decimal
-
+from django.http import HttpResponse
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ImproperlyConfigured
 from django.shortcuts import get_object_or_404
@@ -13,6 +13,7 @@ from django.views.generic.detail import DetailView, SingleObjectMixin
 from django.views.generic.edit import DeleteView, ModelFormMixin, FormView
 from django.views.generic.list import ListView
 
+import pdfkit
 from itertools import chain
 from plans.importer import import_name
 from plans.mixins import LoginRequired
@@ -461,11 +462,9 @@ class InvoiceDetailView(LoginRequired, DetailView):
     def get_template_names(self):
         return getattr(settings, 'PLANS_INVOICE_TEMPLATE', 'plans/invoices/PL_EN.html')
 
-
     def get_context_data(self, **kwargs):
         context = super(InvoiceDetailView, self).get_context_data(**kwargs)
         context['logo_url'] = getattr(settings, 'PLANS_INVOICE_LOGO_URL', None)
-        context['auto_print'] = True
         return context
 
     def get_queryset(self):
@@ -473,7 +472,18 @@ class InvoiceDetailView(LoginRequired, DetailView):
             return super(InvoiceDetailView, self).get_queryset().select_related('order')
         else:
             return super(InvoiceDetailView, self).get_queryset().filter(user=self.request.user).select_related('order')
-
+            
+    def get(self, request, pk):
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = 'filename="invoice-%s.pdf"' % (pk)
+        invoice = super(InvoiceDetailView, self).get(request, pk)
+        invoice.render()
+        try:
+            response.write(pdfkit.from_string(invoice.content.decode('utf-8'), False))
+        except IOError:
+            return invoice
+        return response
+        
 
 class FakePaymentsView(LoginRequired, SingleObjectMixin, FormView):
     form_class = FakePaymentsForm
