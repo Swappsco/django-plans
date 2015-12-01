@@ -34,6 +34,7 @@ setup(
         'celery',
         'suds-jurko',
         'six',
+        'pdfkit>=0.5.0',
     ],
     extras_require={
         'i18n': [

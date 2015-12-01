@@ -51,3 +51,11 @@ Start development web server:
     $ python manage.py runserver
 
 Visit http://localhost:8000/
+
+For the invoice generation we use wkhtmltopdf if it is installed, or return
+a plain html if it is not.
+You can install wkhtmltopdf on ubuntu with:
+
+.. code-block:: bash
+
+    $ sudo apt-get install wkhtmltopdf
