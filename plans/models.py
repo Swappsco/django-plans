@@ -65,6 +65,7 @@ class Plan(OrderedModel):
         if not self.created:
             self.created = now()
 
+
         super(Plan, self).save(*args, **kwargs)
 
     @classmethod
@@ -709,5 +710,3 @@ class Invoice(models.Model):
 
     def is_UE_customer(self):
         return EUTaxationPolicy.is_in_EU(self.buyer_country.code)
-
-
