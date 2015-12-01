@@ -220,7 +220,7 @@ class UserPlan(models.Model):
 
             self.save()
             account_change_plan.send(sender=self, user=self.user)
-            mail_context = Context({'user': self.user, 'userplan': self, 'plan': plan})
+            mail_context = {'user': self.user, 'userplan': self, 'plan': plan}
             send_template_email([self.user.email], 'mail/change_plan_title.txt', 'mail/change_plan_body.txt',
                                 mail_context, get_user_language(self.user))
             accounts_logger.info(
@@ -255,7 +255,7 @@ class UserPlan(models.Model):
                 self.save()
                 accounts_logger.info("Account '%s' [id=%d] has been extended by %d days using plan '%s' [id=%d]" % (
                     self.user, self.user.pk, pricing.period, plan, plan.pk))
-                mail_context = Context({'user': self.user, 'userplan': self, 'plan': plan, 'pricing': pricing})
+                mail_context = {'user': self.user, 'userplan': self, 'plan': plan, 'pricing': pricing}
                 send_template_email([self.user.email], 'mail/extend_account_title.txt', 'mail/extend_account_body.txt',
                                     mail_context, get_user_language(self.user))
 
@@ -271,7 +271,7 @@ class UserPlan(models.Model):
 
         accounts_logger.info("Account '%s' [id=%d] has expired" % (self.user, self.user.pk))
 
-        mail_context = Context({'user': self.user, 'userplan': self})
+        mail_context = {'user': self.user, 'userplan': self}
         send_template_email([self.user.email], 'mail/expired_account_title.txt', 'mail/expired_account_body.txt',
                             mail_context, get_user_language(self.user))
 
@@ -280,7 +280,7 @@ class UserPlan(models.Model):
     def remind_expire_soon(self):
         """reminds about soon account expiration"""
 
-        mail_context = Context({'user': self.user, 'userplan': self, 'days': self.days_left()})
+        mail_context = {'user': self.user, 'userplan': self, 'days': self.days_left()}
         send_template_email([self.user.email], 'mail/remind_expire_title.txt', 'mail/remind_expire_body.txt',
                             mail_context, get_user_language(self.user))
 
@@ -697,12 +697,12 @@ class Invoice(models.Model):
 
         if language_code is not None:
             translation.activate(language_code)
-        mail_context = Context({'user': self.user,
+        mail_context = {'user': self.user,
                                 'invoice_type': self.get_type_display(),
                                 'invoice_number': self.get_full_number(),
                                 'order': self.order.id,
                                 'url': self.get_absolute_url(),
-        })
+        }
         if language_code is not None:
             translation.deactivate()
         send_template_email([self.user.email], 'mail/invoice_created_title.txt', 'mail/invoice_created_body.txt',
