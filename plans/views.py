@@ -1,6 +1,5 @@
 from decimal import Decimal
-from wkhtmltopdf.views import PDFTemplateView
-
+from django.http import HttpResponse
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ImproperlyConfigured
 from django.shortcuts import get_object_or_404
@@ -455,78 +454,12 @@ class BillingInfoDeleteView(LoginRequired, DeleteView):
         messages.success(self.request, _('Billing info has been deleted.'))
         return reverse('billing_info_create')
 
-def wkhtmltopdf(pages, output=None, **kwargs):
-    """
-    Converts html to PDF using http://wkhtmltopdf.org/.
-    pages: List of file paths or URLs of the html to be converted.
-    output: Optional output file path. If None, the output is returned.
-    **kwargs: Passed to wkhtmltopdf via _extra_args() (See
-              https://github.com/antialize/wkhtmltopdf/blob/master/README_WKHTMLTOPDF
-              for acceptable args.)
-              Kwargs is passed through as arguments. e.g.:
-                  {'footer_html': 'http://example.com/foot.html'}
-              becomes
-                  '--footer-html http://example.com/foot.html'
-              Where there is no value passed, use True. e.g.:
-                  {'disable_javascript': True}
-              becomes:
-                  '--disable-javascript'
-              To disable a default option, use None. e.g:
-                  {'quiet': None'}
-              becomes:
-                  ''
-    example usage:
-        wkhtmltopdf(pages=['/tmp/example.html'],
-                    dpi=300,
-                    orientation='Landscape',
-                    disable_javascript=True)
-    """
-    import os, shlex
-
-    if output is None:
-        # Standard output.
-        output = '-'
-
-    # Default options:
-    options = getattr(settings, 'WKHTMLTOPDF_CMD_OPTIONS', None)
-    if options is None:
-        options = {'quiet': True}
-    else:
-        options = copy(options)
-    options.update(kwargs)
-
-    # Force --encoding utf8 unless the user has explicitly overridden this.
-    options.setdefault('encoding', 'utf8')
-
-    env = getattr(settings, 'WKHTMLTOPDF_ENV', None)
-    if env is not None:
-        env = dict(os.environ, **env)
-
-    cmd = 'WKHTMLTOPDF_CMD'
-    cmd = getattr(settings, cmd, os.environ.get(cmd, 'wkhtmltopdf'))
-
-    ck_args = list(chain(shlex.split(cmd),
-                         _options_to_args(**options),
-                         list(pages),
-                         [output]))
-    ck_kwargs = {'env': env}
-    # Handling of fileno() attr. based on https://github.com/GrahamDumpleton/mod_wsgi/issues/85
-    try:
-        i = sys.stderr.fileno()
-        ck_kwargs['stderr'] = sys.stderr
-    except (AttributeError, IOError):
-        # can't call fileno() on mod_wsgi stderr object
-        pass
-
-    return check_output(ck_args, **ck_kwargs)
-
 
 class InvoiceDetailView(LoginRequired, DetailView):
     model = Invoice
 
     def get_template_names(self):
         return getattr(settings, 'PLANS_INVOICE_TEMPLATE', 'plans/invoices/PL_EN.html')
-
 
     def get_context_data(self, **kwargs):
         context = super(InvoiceDetailView, self).get_context_data(**kwargs)
@@ -539,20 +472,18 @@ class InvoiceDetailView(LoginRequired, DetailView):
         else:
             return super(InvoiceDetailView, self).get_queryset().filter(user=self.request.user).select_related('order')
             
-    def convert_to_pdf(self, filename, header_filename=None, footer_filename=None, cmd_options=None):
-        # Clobber header_html and footer_html only if filenames are
-        # provided. These keys may be in self.cmd_options as hardcoded
-        # static files.    
-        if header_filename is not None:
-            cmd_options['header_html'] = header_filename
-        if footer_filename is not None:
-            cmd_options['footer_html'] = footer_filename
-        return wkhtmltopdf(pages=[filename])
-                
     def get(self, request, pk):
-        response = super(InvoiceDetailView, self).get(request, pk).render()
-        print self.convert_to_pdf(self.template_name, None, None, response)
-
+        import pdfkit
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = 'filename="invoice%s.pdf"' % (pk)
+        invoice = super(InvoiceDetailView, self).get(request, pk)
+        invoice.render()
+        try:
+            response.write(pdfkit.from_string(invoice.content.decode('utf-8'), False))
+        except IOError:
+            return invoice
+        return response
+        
 
 class FakePaymentsView(LoginRequired, SingleObjectMixin, FormView):
     form_class = FakePaymentsForm
