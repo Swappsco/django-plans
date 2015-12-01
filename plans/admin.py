@@ -89,7 +89,7 @@ class BillingInfoAdmin(UserLinkMixin, admin.ModelAdmin):
 
     # TODO: is there a better approach?
     try:
-        _email_field = _user_model._meta.get_field_by_name("email")
+        _email_field = _user_model._meta.get_field("email")
     except:
         _email_field = None
 
@@ -140,7 +140,7 @@ class OrderAdmin(admin.ModelAdmin):
 
     # TODO: is there a better approach?
     try:
-        _email_field = _user_model._meta.get_field_by_name("email")
+        _email_field = _user_model._meta.get_field("email")
     except:
         _email_field = None
 
@@ -183,7 +183,7 @@ class UserPlanAdmin(UserLinkMixin, admin.ModelAdmin):
 
     # TODO: is there a better approach?
     try:
-        _email_field = _user_model._meta.get_field_by_name("email")
+        _email_field = _user_model._meta.get_field("email")
     except:
         _email_field = None
 
