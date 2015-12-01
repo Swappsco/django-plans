@@ -52,6 +52,15 @@ Start development web server:
 
 Visit http://localhost:8000/
 
+To implement a development environment with the development package and the chance to view the changes while they are made use:
+
+.. code-block:: bash
+
+    $ cd django-plans/demo/
+    $ pip install -e ../plans
+
+This should install the development package and it will update each time you incorporate some changes to the project.
+
 For the invoice generation we use wkhtmltopdf if it is installed, or return
 a plain html if it is not.
 You can install wkhtmltopdf on ubuntu with:
