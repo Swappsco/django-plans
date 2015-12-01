@@ -75,7 +75,8 @@ class PlanAdmin(OrderedModelAdmin):
     actions = [copy_plan, ]
 
     def queryset(self, request):
-        return super(PlanAdmin, self).queryset(request).select_related('customized')
+        return super(PlanAdmin, self).queryset(request).select_related(
+            'customized')
 
 
 class BillingInfoAdmin(UserLinkMixin, admin.ModelAdmin):
@@ -116,7 +117,8 @@ make_order_completed.short_description = _('Make selected orders completed')
 
 def make_order_invoice(modeladmin, request, queryset):
     for order in queryset:
-        if Invoice.objects.filter(type=Invoice.INVOICE_TYPES['INVOICE'], order=order).count() == 0:
+        if Invoice.objects.filter(type=Invoice.INVOICE_TYPES['INVOICE'],
+                                  order=order).count() == 0:
             Invoice.create(order, Invoice.INVOICE_TYPES['INVOICE'])
 
 
