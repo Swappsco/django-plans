@@ -717,7 +717,7 @@ class ViewsTestCase(TestCase):
         """
         response = self.client.get(reverse('invoice_preview', 
             args=[Invoice.objects.first().pk]))
-        self.assertTrue('Content-Type: text/html' in response.serialize_headers())
+        self.assertTrue(b'Content-Type: text/html' in response.serialize_headers())
         self.assertEqual(response.status_code, 200)
         
     
