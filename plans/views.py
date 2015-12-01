@@ -13,6 +13,7 @@ from django.views.generic.detail import DetailView, SingleObjectMixin
 from django.views.generic.edit import DeleteView, ModelFormMixin, FormView
 from django.views.generic.list import ListView
 
+import pdfkit
 from itertools import chain
 from plans.importer import import_name
 from plans.mixins import LoginRequired
@@ -21,6 +22,8 @@ from plans.forms import CreateOrderForm, BillingInfoForm, FakePaymentsForm
 from plans.models import Quota, Invoice
 from plans.signals import order_started
 from plans.validators import plan_validation
+
+
 
 
 class AccountActivationView(LoginRequired, TemplateView):
@@ -473,7 +476,6 @@ class InvoiceDetailView(LoginRequired, DetailView):
             return super(InvoiceDetailView, self).get_queryset().filter(user=self.request.user).select_related('order')
             
     def get(self, request, pk):
-        import pdfkit
         response = HttpResponse(content_type='application/pdf')
         response['Content-Disposition'] = 'filename="invoice%s.pdf"' % (pk)
         invoice = super(InvoiceDetailView, self).get(request, pk)
