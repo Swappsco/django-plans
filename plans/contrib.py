@@ -4,16 +4,17 @@ from django.core import mail
 from django.core.exceptions import ImproperlyConfigured
 from django.template import loader
 from django.utils import translation
-try: # pragma: no cover
+try:  # pragma: no cover
     from django.apps import apps
     cache = apps
-except (ImportError) as e: # pragma: no cover
+except (ImportError) as e:  # pragma: no cover
     from django.db.models.loading import cache
 
 from plans.signals import user_language
 
 
 email_logger = logging.getLogger('emails')
+
 
 def send_template_email(recipients, title_template, body_template, context, language):
     """Sends e-mail using templating system"""
@@ -31,7 +32,7 @@ def send_template_email(recipients, title_template, body_template, context, lang
         site_name = current_site.name
         domain = current_site.domain
 
-    context.update({'site_name' : site_name, 'site_domain': domain})
+    context.update({'site_name': site_name, 'site_domain': domain})
 
     if language is not None:
         original_language = translation.get_language()
@@ -47,11 +48,13 @@ def send_template_email(recipients, title_template, body_template, context, lang
     if language is not None:
         translation.activate(original_language)
 
-    email_logger.info(u"Email (%s) sent to %s\nTitle: %s\n%s\n\n" % (language, recipients, title, body))
+    email_logger.info(u"Email ({0}) sent to {1}\nTitle: {2}\n{3}\n\n".format(
+        language, recipients, title, body))
 
 
 def get_user_language(user):
-    """ Simple helper that will fire django signal in order to get User language possibly given by other part of application.
+    """ Simple helper that will fire django signal in order to get User
+        language possibly given by other part of application.
     :param user:
     :return: string or None
     """
