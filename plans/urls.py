@@ -25,7 +25,7 @@ urlpatterns = patterns(
     url(r'^billing/create/$', BillingInfoCreateView.as_view(), name='billing_info_create'),
     url(r'^billing/update/$', BillingInfoUpdateView.as_view(), name='billing_info_update'),
     url(r'^billing/delete/$', BillingInfoDeleteView.as_view(), name='billing_info_delete'),
-    url(r'^invoice/(?P<pk>\d+)/preview/html/$', InvoiceDetailView.as_view(), name='invoice_preview_html'),
+    url(r'^invoice/(?P<pk>\d+)/preview/$', InvoiceDetailView.as_view(), name='invoice_preview'),
 )
 
 if getattr(settings, 'DEBUG', False): # pragma: no cover

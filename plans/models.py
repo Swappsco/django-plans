@@ -556,7 +556,7 @@ class Invoice(models.Model):
         return self.full_number
 
     def get_absolute_url(self):
-        return reverse('invoice_preview_html', kwargs={'pk': self.pk})
+        return reverse('invoice_preview', kwargs={'pk': self.pk})
 
     def clean(self):
         if self.number is None:

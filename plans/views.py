@@ -1,4 +1,5 @@
 from decimal import Decimal
+from wkhtmltopdf.views import PDFTemplateView
 
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ImproperlyConfigured
@@ -465,7 +466,6 @@ class InvoiceDetailView(LoginRequired, DetailView):
     def get_context_data(self, **kwargs):
         context = super(InvoiceDetailView, self).get_context_data(**kwargs)
         context['logo_url'] = getattr(settings, 'PLANS_INVOICE_LOGO_URL', None)
-        context['auto_print'] = True
         return context
 
     def get_queryset(self):

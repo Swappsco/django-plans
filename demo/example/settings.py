@@ -87,6 +87,7 @@ INSTALLED_APPS = (
 
     'ordered_model',
     'bootstrap3',
+    'wkhtmltopdf',
 
     'plans',
     'example.foo',
