@@ -3,6 +3,9 @@ django-plans changelog
 
 0.8
 ---
+* Release version 0.8.9
+  * Updated project to work with django1.9.
+  * Updated project to avoid deprecation warnings when running django.
 * Release version 0.8.8
   * Updated the CHANGELOG file to include a record of the different updates, fixes and modifications
   made to the project since the 0.7 version, where the original project stopped getting regular updates.
