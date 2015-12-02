@@ -9,6 +9,7 @@ env:
 branches:
   only:
     - master
+    - develop
 # command to install dependencies
 install:
   - "pip install -q -e ."
