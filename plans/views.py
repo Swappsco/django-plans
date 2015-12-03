@@ -397,8 +397,10 @@ class OrderPaymentReturnView(LoginRequired, DetailView):
         if self.status == 'success':
             messages.success(self.request,
                              _('Thank you for placing a payment. It will be processed as soon as possible.'))
+
         elif self.status == 'failure':
-            messages.error(self.request, _('Payment was not completed correctly. Please repeat payment process.'))
+            messages.error(self.request,
+                           _('Payment was not completed correctly. Please repeat payment process.'))
 
         return HttpResponseRedirect(self.object.get_absolute_url())
 
