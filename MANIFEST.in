@@ -1,0 +1,8 @@
+include *.TXT
+include README.rst
+include AUTHORS
+include CHANGELOG
+recursive-include plans/templates *
+recursive-include plans/fixtures *
+recursive-include plans/locale *
+

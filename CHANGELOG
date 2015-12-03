@@ -1,0 +1,126 @@
+django-plans changelog
+======================
+
+0.8
+---
+* Release version 0.8.9
+  * Updated project to work with django1.9.
+  * Updated project to avoid deprecation warnings when running django.
+* Release version 0.8.8
+  * Updated the CHANGELOG file to include a record of the different updates, fixes and modifications
+  made to the project since the 0.7 version, where the original project stopped getting regular updates.
+  * Updating the AUTHORS file to include the actual maintainer, also to include collaborators into
+  the same file, because there weren't a file inside the original project to include them.
+  * Invoices are now shown as PDF is wkhtmltopdf is installed. Fallback silently to html.
+  * PEP-8 updates.
+* Release version 0.8.7
+  * Merge branch 'feature/improve-coverage' into develop
+  * Add tests for contrib
+  * Add test for VAT validation
+  * Add test for VAT validation
+  * Add tests for plans and userplans models
+  * Add test for importer.py
+  * Add tests for TaxationPolicy
+  * Add .coveragerc to get coverage only for django-plans files
+  * Refactor project to pass tests using fixtures. Should replace
+  * Add files to run tests for plan directly, instead of running
+  * Revert change
+  * Replace access mixin for braces
+* Release version 0.8.6
+  * Made PLANS_TAX optional
+* Release version 0.8.5
+  * Add requires.io badge and badge.fury.io badge
+  * Add coveralls badge
+  * Add coveralls to travis.yml
+  * Update repository links
+  * Bump version
+  * Update code to support case where there is no current plan
+  * Update admin to avoid errors
+  * Fix sample project and tests
+  * When there is no default plan, a userplan object with no plan is allowed
+  * Bump version for pypi
+* Release version 0.8.4
+  * Add rtd link to docs
+* Release version 0.8.3
+  * Remove django settings from docs build
+  * Update conf.py
+  * Comment out conf.py
+  * Remove img from docs
+  * Update doc
+* Release version 0.8.2
+  * Fix broken migration
+  * Bump version. Update travis.yml to include migrations
+* Release version 0.8.1
+  * Add migrations to project
+* Release version 0.8.0
+* Update project to support Django 1.8
+  * Update badge system
+  * Ignore django 1.9 warnings for now
+  * Remove python from shebang on manage.py
+  * Update settings to follow current django structure
+  * Fix issues with django version
+  * Update travis.yml
+  * bump version on setup.py
+  * Leave support for django1.6.
+  * Update demo project to use data migrations instead of loaddata
+  * Fix incorrect upgrade of django.db.models.loading
+  * Remove django deprecation warnings
+  * Update demo project to run django1.8 migrations
+  * Merge branch 'free-plan-support' of github.com:kiratalent/django-plans
+
+0.7
+---
+* Changes in plans.taxation.eu.EUTaxationPolicy to implement new EU VAT regulations (MOSS)
+* Clean up settings variables naming conventions prepending PLANS_ prefix:
+  * Renamed settings variable name TAXATION_POLICY to PLANS_TAXATION_POLICY
+  * Renamed settings variable name ISSUER_DATA to PLANS_INVOICE_ISSUER
+  * Renamed settings variable name PLAN_EXPIRATION_REMIND to PLANS_EXPIRATION_REMIND
+  * Renamed settings variable name PLAN_CHANGE_POLICY to PLANS_CHANGE_POLICY
+  * Renamed settings variable name PLAN_VALIDATORS to PLANS_VALIDATORS
+  * Renamed settings variable name CURRENCY to PLANS_CURRENCY
+  * Renamed settings variable name TAX to PLANS_TAX
+  * Renamed settings variable name TAX_COUNTRY to PLANS_TAX_COUNTRY
+  * Renamed settings variable name INVOICE_LOGO_URL to PLANS_INVOICE_LOGO_URL
+  * Renamed settings variable name INVOICE_NUMBER_FORMAT to PLANS_INVOICE_NUMBER_FORMAT
+  * Renamed settings variable name INVOICE_TEMPLATE to PLANS_INVOICE_TEMPLATE
+  * Renamed settings variable name INVOICE_COUNTER_RESET to PLANS_INVOICE_COUNTER_RESET
+  * Renamed settings variable name ORDER_EXPIRATION to PLANS_ORDER_EXPIRATION
+  * Renamed settings variable name PLAN_DEFAULT_GRACE_PERIOD to PLANS_DEFAULT_GRACE_PERIOD
+
+0.6+
+----
+* Changing `QuotaValidator` API. `ModelCountValidator` requires now to give `add` argument only as a kwarg.
+* Adding support for defining URL for plan, quota and pricing period that will act as a clickable pricing
+  table header (requires schema migration)
+* Rename settings variable PLAN_ACTIVATION_VALIDATORS to PLAN_VALIDATORS
+* Major refactoring of Validators API providing new feature - required_to_activate False/True for validators
+* updating dependency to django-countries>=2.0 (fixes #29)
+* support for django1.6 (fixes #28)
+* complete demo application using Boostrap v3 for cool look
+* adding missing default templates
+* refactored login_required decorator usage (issue #20)
+* taxation policies are moved from locale directory (issue #13) warning: backward incompatible!
+* dependencies (apart from suds) are reviewed and refactored in setup.py (issue #9)
+
+v.0.5 - v0.6
+------------
+
+[...] (FIXME: write history changelog from git commits
+
+v.0.4
+-----
+
+* Migrating to django-countries. Requires schema migration.
+
+v.0.3
+-----
+
+* Change plan policy - custom action how to billing change plan (downgrade/upgrade) can be implemented
+* Taxation policy - custom action how to calculate tax can be implemented
+* Dropping south migrations, it should be managed now as a project dependent migrations via SOUTH_MIGRATION_MODULES
+
+v. 0.1.1
+--------
+
+* Added field default to Plans model - it means that this plan is supposed to be added to every new user. Via south migration 0002
+* Added South migrations

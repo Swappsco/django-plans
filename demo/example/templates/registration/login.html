@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% load bootstrap3 %}
+
+
+{% block body %}
+    <div class="row">
+        <div class="col-sm-6">
+
+        <form action="" method="post" class="form">
+            <legend>Sign-in</legend>
+            <div class="well well-sm">To login use test1/test1 for username/password.</div>
+
+            {% csrf_token %}
+            {% bootstrap_form form %}
+            {% buttons %}
+                <button type="submit" class="btn btn-primary">
+                    {% bootstrap_icon "log-in" %} Sign-in
+                </button>
+            {% endbuttons %}
+          {% if next %}<input type="hidden" name="next" value="{{ next }}" />{% endif %}
+        </form>
+        </div>
+    </div>
+
+{% endblock %}

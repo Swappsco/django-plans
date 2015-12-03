@@ -1,0 +1,14 @@
+django>=1.9,<1.10
+django-ordered-model>=0.4.2
+django-bootstrap3
+Sphinx
+django-debug-toolbar
+django-extensions
+mock
+tox
+suds-jurko
+pdfkit>=0.5.0
+
+# Not supported in py3
+#fabric
+#transifex-client
