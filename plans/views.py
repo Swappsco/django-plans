@@ -3,7 +3,8 @@ from django.http import HttpResponse
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ImproperlyConfigured
 from django.shortcuts import get_object_or_404
-from django.views.generic import TemplateView, RedirectView, CreateView, UpdateView, View
+from django.views.generic import (TemplateView, RedirectView,
+                                  CreateView, UpdateView, View)
 from django.db.models import Q
 from django.http import Http404, HttpResponseRedirect, HttpResponseForbidden
 from django.conf import settings
@@ -59,30 +60,34 @@ class PlanTableMixin(object):
             ( QuotaM, [ Plan1QuotaM, Plan2QuotaM, ... , PlanNQuotaM] ),
         ]
 
-        This can be very easily printed as an HTML table element with quotas by row.
+        This can be very easily printed as an HTML table element with quotas
+        by row.
 
-        Quotas are calculated based on ``plan_list``. These are all available quotas that are
-        used by given plans. If any ``Plan`` does not have any of ``PlanQuota`` then value ``None``
-        will be propagated to the data structure.
+        Quotas are calculated based on ``plan_list``. These are all available
+        quotas that are used by given plans. If any ``Plan`` does not have any
+        of ``PlanQuota`` then value ``None`` will be propagated to the data
+        structure.
 
         """
 
         # Retrieve all quotas that are used by any ``Plan`` in ``plan_list``
-        quota_list = Quota.objects.all().filter(planquota__plan__in=plan_list).distinct()
+        quota_list = Quota.objects.all().filter(
+            planquota__plan__in=plan_list).distinct()
 
-        # Create random access dict that for every ``Plan`` map ``Quota`` -> ``PlanQuota``
+        # Create random access dict that for every ``Plan`` map
+        # ``Quota`` -> ``PlanQuota``
         plan_quotas_dic = {}
         for plan in plan_list:
             plan_quotas_dic[plan] = {}
             for plan_quota in plan.planquota_set.all():
                 plan_quotas_dic[plan][plan_quota.quota] = plan_quota
 
-        # Generate data structure described in method docstring, propagate ``None`` whenever
-        # ``PlanQuota`` is not available for given ``Plan`` and ``Quota``
-        return map(lambda quota: (quota,
-                                  map(lambda plan: plan_quotas_dic[plan].get(quota, None), plan_list)
-
-        ), quota_list)
+        # Generate data structure described in method docstring, propagate
+        # ``None`` whenever ``PlanQuota`` is not available for given ``Plan``
+        # and ``Quota``
+        return map(
+            lambda quota: (quota, map(lambda plan: plan_quotas_dic[plan].get(
+                quota, None), plan_list)), quota_list)
 
 
 class PlanTableViewBase(PlanTableMixin, ListView):
@@ -90,8 +95,9 @@ class PlanTableViewBase(PlanTableMixin, ListView):
     context_object_name = "plan_list"
 
     def get_queryset(self):
-        queryset = super(PlanTableViewBase, self).get_queryset().prefetch_related('planpricing_set__pricing',
-                                                                                  'planquota_set__quota')
+        queryset = super(
+            PlanTableViewBase, self).get_queryset().prefetch_related(
+                'planpricing_set__pricing', 'planquota_set__quota')
         if self.request.user.is_authenticated():
             queryset = queryset.filter(
                 Q(available=True, visible=True) & (
@@ -128,8 +134,9 @@ class CurrentPlanView(LoginRequired, PlanTableViewBase):
     template_name = "plans/current.html"
 
     def get_queryset(self):
-        return Plan.objects.filter(userplan__user=self.request.user).prefetch_related('planpricing_set__pricing',
-                                                                                      'planquota_set__quota')
+        return Plan.objects.filter(
+            userplan__user=self.request.user).prefetch_related(
+                'planpricing_set__pricing', 'planquota_set__quota')
 
 
 class UpgradePlanView(LoginRequired, PlanTableViewBase):
@@ -142,14 +149,16 @@ class PricingView(PlanTableViewBase):
 
 class ChangePlanView(LoginRequired, View):
     """
-    A view for instant changing user plan when it does not require additional payment.
-    Plan can be changed without payment when:
-    * user can enable this plan (it is available & visible and if it is customized for him,
+    A view for instant changing user plan when it does not require additional
+    payment. Plan can be changed without payment when:
+    * user can enable this plan (it is available & visible and if it is
+    customized for him,
     * plan is different from the current one that user have,
-    * within current change plan policy this does not require any additional payment (None)
+    * within current change plan policy this does not require any additional
+    payment (None)
 
-    It always redirects to ``upgrade_plan`` url as this is a potential only one place from
-    where change plan could be invoked.
+    It always redirects to ``upgrade_plan`` url as this is a potential only
+    one place from where change plan could be invoked.
     """
 
     def get(self, request, *args, **kwargs):
@@ -160,14 +169,17 @@ class ChangePlanView(LoginRequired, View):
             Q(customized=request.user) | Q(customized__isnull=True)))
         if request.user.userplan.plan != plan:
             policy = import_name(
-                getattr(settings, 'PLANS_CHANGE_POLICY', 'plans.plan_change.StandardPlanChangePolicy'))()
+                getattr(settings, 'PLANS_CHANGE_POLICY',
+                        'plans.plan_change.StandardPlanChangePolicy'))()
 
             period = request.user.userplan.days_left()
-            price = policy.get_change_price(request.user.userplan.plan, plan, period)
+            price = policy.get_change_price(request.user.userplan.plan,
+                                            plan, period)
 
             if price is None:
                 request.user.userplan.extend_account(plan, None)
-                messages.success(request, _("Your plan has been successfully changed"))
+                messages.success(request, _(
+                    "Your plan has been successfully changed"))
             else:
                 return HttpResponseForbidden()
         return HttpResponseRedirect(reverse('upgrade_plan'))
@@ -197,8 +209,9 @@ class CreateOrderView(LoginRequired, CreateView):
         tax_number = getattr(billing_info, 'tax_number', None)
 
         # Calculating tax can be complex task (e.g. VIES webservice call)
-        # To ensure that tax calculated on order preview will be the same on final order
-        # tax rate is cached for a given billing data (as this value only depends on it)
+        # To ensure that tax calculated on order preview will be the same on
+        # final order tax rate is cached for a given billing data (as this
+        # value only depends on it)
         tax_session_key = "tax_%s_%s" % (tax_number, country)
 
         tax = self.request.session.get(tax_session_key)
@@ -229,7 +242,6 @@ class CreateOrderView(LoginRequired, CreateView):
                                                                           validation_errors['other'])),
                                          })
 
-
     def get_all_context(self):
         """
         Retrieves Plan and Pricing for current order creation
@@ -251,7 +263,6 @@ class CreateOrderView(LoginRequired, CreateView):
         self.plan = self.plan_pricing.plan
         self.pricing = self.plan_pricing.pricing
 
-
     def get_billing_info(self):
         try:
             return self.request.user.billinginfo
@@ -261,7 +272,9 @@ class CreateOrderView(LoginRequired, CreateView):
     def get_currency(self):
         CURRENCY = getattr(settings, 'PLANS_CURRENCY', '')
         if len(CURRENCY) != 3:
-            raise ImproperlyConfigured('PLANS_CURRENCY should be configured as 3-letter currency code.')
+            raise ImproperlyConfigured(
+                'PLANS_CURRENCY should be configured as 3-letter currency code.')
+
         return CURRENCY
 
     def get_price(self):
@@ -272,7 +285,8 @@ class CreateOrderView(LoginRequired, CreateView):
         self.get_all_context()
         context['billing_info'] = self.get_billing_info()
 
-        order = self.recalculate(self.plan_pricing.price, context['billing_info'])
+        order = self.recalculate(
+            self.plan_pricing.price, context['billing_info'])
         order.plan = self.plan_pricing.plan
         order.pricing = self.plan_pricing.pricing
         order.currency = self.get_currency()
@@ -283,8 +297,8 @@ class CreateOrderView(LoginRequired, CreateView):
 
     def form_valid(self, form):
         self.get_all_context()
-        order = self.recalculate(self.get_price() or Decimal('0.0'), self.get_billing_info())
-
+        order = self.recalculate(
+            self.get_price() or Decimal('0.0'), self.get_billing_info())
         self.object = form.save(commit=False)
         self.object.user = self.request.user
         self.object.plan = self.plan
@@ -307,7 +321,8 @@ class CreateOrderPlanChangeView(CreateOrderView):
         self.pricing = None
 
     def get_policy(self):
-        policy_class = getattr(settings, 'PLANS_CHANGE_POLICY', 'plans.plan_change.StandardPlanChangePolicy')
+        policy_class = getattr(settings, 'PLANS_CHANGE_POLICY',
+                               'plans.plan_change.StandardPlanChangePolicy')
         return import_name(policy_class)()
 
     def get_price(self):
@@ -320,7 +335,8 @@ class CreateOrderPlanChangeView(CreateOrderView):
             # Use the default period of the new plan
             period = 30
 
-        return policy.get_change_price(self.request.user.userplan.plan, self.plan, period)
+        return policy.get_change_price(
+            self.request.user.userplan.plan, self.plan, period)
 
     def get_context_data(self, **kwargs):
         context = super(CreateOrderView, self).get_context_data(**kwargs)
@@ -345,7 +361,8 @@ class OrderView(LoginRequired, DetailView):
     model = Order
 
     def get_queryset(self):
-        return super(OrderView, self).get_queryset().filter(user=self.request.user).select_related('plan', 'pricing', )
+        return super(OrderView, self).get_queryset().filter(
+            user=self.request.user).select_related('plan', 'pricing', )
 
 
 class OrderListView(LoginRequired, ListView):
@@ -356,20 +373,22 @@ class OrderListView(LoginRequired, ListView):
         context = super(OrderListView, self).get_context_data(**kwargs)
         self.CURRENCY = getattr(settings, 'PLANS_CURRENCY', None)
         if len(self.CURRENCY) != 3:
-            raise ImproperlyConfigured('PLANS_CURRENCY should be configured as 3-letter currency code.')
+            raise ImproperlyConfigured(
+                'PLANS_CURRENCY should be configured as 3-letter currency code.')
+
         context['CURRENCY'] = self.CURRENCY
         return context
 
-
     def get_queryset(self):
-        return super(OrderListView, self).get_queryset().filter(user=self.request.user).select_related('plan',
-                                                                                                       'pricing', )
+        return super(
+            OrderListView, self).get_queryset().filter(
+                user=self.request.user).select_related('plan', 'pricing', )
 
 
 class OrderPaymentReturnView(LoginRequired, DetailView):
     """
-    This view is a fallback from any payments processor. It allows just to set additional message
-    context and redirect to Order view itself.
+    This view is a fallback from any payments processor. It allows just to set
+    additional message context and redirect to Order view itself.
     """
     model = Order
     status = None
@@ -383,14 +402,16 @@ class OrderPaymentReturnView(LoginRequired, DetailView):
 
         return HttpResponseRedirect(self.object.get_absolute_url())
 
-
     def get_queryset(self):
-        return super(OrderPaymentReturnView, self).get_queryset().filter(user=self.request.user)
+        return super(
+            OrderPaymentReturnView, self).get_queryset().filter(
+                user=self.request.user)
 
 
 class BillingInfoRedirectView(LoginRequired, RedirectView):
     """
-    Checks if billing data for user exists and redirects to create or update view.
+    Checks if billing data for user exists and redirects to create or update
+    view.
     """
     permanent = False
 
@@ -416,7 +437,8 @@ class BillingInfoCreateView(LoginRequired, CreateView):
         return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self):
-        messages.success(self.request, _('Billing info has been updated successfuly.'))
+        messages.success(self.request,
+                         _('Billing info has been updated successfuly.'))
         return reverse('billing_info_update')
 
 
@@ -435,7 +457,8 @@ class BillingInfoUpdateView(LoginRequired, UpdateView):
             raise Http404
 
     def get_success_url(self):
-        messages.success(self.request, _('Billing info has been updated successfuly.'))
+        messages.success(self.request,
+                         _('Billing info has been updated successfuly.'))
         return reverse('billing_info_update')
 
 
@@ -460,7 +483,8 @@ class InvoiceDetailView(LoginRequired, DetailView):
     model = Invoice
 
     def get_template_names(self):
-        return getattr(settings, 'PLANS_INVOICE_TEMPLATE', 'plans/invoices/PL_EN.html')
+        return getattr(settings,
+                       'PLANS_INVOICE_TEMPLATE', 'plans/invoices/PL_EN.html')
 
     def get_context_data(self, **kwargs):
         context = super(InvoiceDetailView, self).get_context_data(**kwargs)
@@ -469,21 +493,27 @@ class InvoiceDetailView(LoginRequired, DetailView):
 
     def get_queryset(self):
         if self.request.user.is_superuser:
-            return super(InvoiceDetailView, self).get_queryset().select_related('order')
+            return super(
+                InvoiceDetailView, self).get_queryset().select_related('order')
         else:
-            return super(InvoiceDetailView, self).get_queryset().filter(user=self.request.user).select_related('order')
-            
+            return super(
+                InvoiceDetailView, self).get_queryset().filter(
+                    user=self.request.user).select_related('order')
+
     def get(self, request, pk):
         response = HttpResponse(content_type='application/pdf')
         response['Content-Disposition'] = 'filename="invoice-%s.pdf"' % (pk)
         invoice = super(InvoiceDetailView, self).get(request, pk)
         invoice.render()
         try:
-            response.write(pdfkit.from_string(invoice.content.decode('utf-8'), False))
+            response.write(
+                pdfkit.from_string(invoice.content.decode('utf-8'), False))
+
         except IOError:
             return invoice
+
         return response
-        
+
 
 class FakePaymentsView(LoginRequired, SingleObjectMixin, FormView):
     form_class = FakePaymentsForm
@@ -493,22 +523,28 @@ class FakePaymentsView(LoginRequired, SingleObjectMixin, FormView):
     def get_success_url(self):
         return self.object.get_absolute_url()
 
-
     def get_queryset(self):
-        return super(FakePaymentsView, self).get_queryset().filter(user=self.request.user)
+        return super(
+            FakePaymentsView, self).get_queryset().filter(
+                user=self.request.user)
 
     def dispatch(self, *args, **kwargs):
         if not getattr(settings, 'DEBUG', False):
-            return HttpResponseForbidden('This view is accessible only in debug mode.')
+            return HttpResponseForbidden(
+                'This view is accessible only in debug mode.')
+
         self.object = self.get_object()
         return super(FakePaymentsView, self).dispatch(*args, **kwargs)
 
     def form_valid(self, form):
         if int(form['status'].value()) == Order.STATUS.COMPLETED:
             self.object.complete_order()
-            return HttpResponseRedirect(reverse('order_payment_success', kwargs={'pk': self.object.pk}))
+            return HttpResponseRedirect(
+                reverse('order_payment_success',
+                        kwargs={'pk': self.object.pk}))
         else:
             self.object.status = form['status'].value()
             self.object.save()
-            return HttpResponseRedirect(reverse('order_payment_failure', kwargs={'pk': self.object.pk}))
-
+            return HttpResponseRedirect(
+                reverse('order_payment_failure',
+                        kwargs={'pk': self.object.pk}))

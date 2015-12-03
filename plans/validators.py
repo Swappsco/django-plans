@@ -16,7 +16,8 @@ class QuotaValidator(object):
 
     @property
     def code(self):
-        raise ImproperlyConfigured('Quota code name is not provided for validator')
+        raise ImproperlyConfigured(
+            'Quota code name is not provided for validator')
 
     def get_quota_value(self, user, quota_dict=None):
         """
@@ -38,17 +39,19 @@ class QuotaValidator(object):
 
     def on_activation(self, user, quota_dict=None, **kwargs):
         """
-        Hook for any action that validator needs to do while successful activation of the plan
-        Most useful for validators not required to activate, e.g. some "option" is turned ON for user
-        but when user downgrade plan this option should be turned OFF automatically rather than
-        stops account activation
+        Hook for any action that validator needs to do while successful
+        activation of the plan Most useful for validators not required to
+        activate, e.g. some "option" is turned ON for user but when user
+        downgrade plan this option should be turned OFF automatically rather
+        than stops account activation
         """
         pass
 
 
 class ModelCountValidator(QuotaValidator):
     """
-    Validator that checks if there is no more than quota number of objects given model
+    Validator that checks if there is no more than quota number of objects
+    given model
     """
 
     @property
@@ -73,16 +76,18 @@ class ModelCountValidator(QuotaValidator):
 
 class ModelAttributeValidator(ModelCountValidator):
     """
-    Validator checks if every obj.attribute value for a given model satisfy condition
-    provided in check_attribute_value() method.
+    Validator checks if every obj.attribute value for a given model satisfy
+    condition provided in check_attribute_value() method.
 
     .. warning::
-        ModelAttributeValidator requires `get_absolute_url()` method on provided model.
+        ModelAttributeValidator requires `get_absolute_url()` method on
+        provided model.
     """
 
     @property
     def attribute(self):
-        raise ImproperlyConfigured('ModelAttributeValidator requires defining attribute name')
+        raise ImproperlyConfigured(
+            'ModelAttributeValidator requires defining attribute name')
 
     def check_attribute_value(self, attribute_value, quota_value):
         # default is to value is <= limit
