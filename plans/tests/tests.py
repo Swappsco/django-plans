@@ -3,23 +3,8 @@ from datetime import date, datetime
 from datetime import timedelta
 import vatnumber
 
-from django.core.exceptions import ImproperlyConfigured, ValidationError
-from django.core.urlresolvers import reverse
-from django.test import TestCase, Client
-from django.contrib.auth import get_user_model
-from django.conf import settings
-from django.core import mail
-from django.db.models import Q
-from django.utils import six
-from django.utils.translation import get_language, activate
-
-
-if six.PY2: # pragma: no cover
-    import mock
-elif six.PY3: # pragma: no cover
-    from unittest import mock
-
-from plans.models import PlanPricing, Invoice, Order, Plan, UserPlan, BillingInfo
+from plans.models import (PlanPricing, Invoice, Order,
+                          Plan, UserPlan, BillingInfo)
 from plans.plan_change import PlanChangePolicy, StandardPlanChangePolicy
 from plans.taxation import TaxationPolicy
 from plans.taxation.eu import EUTaxationPolicy
@@ -30,12 +15,27 @@ from plans.admin import UserLinkMixin
 from plans.contrib import send_template_email
 from plans.forms import BillingInfoForm
 
-from decimal import Decimal
+from django.core.exceptions import ImproperlyConfigured, ValidationError
+from django.core.urlresolvers import reverse
+from django.test import TestCase, Client
+from django.contrib.auth import get_user_model
+from django.conf import settings
+from django.core import mail
+from django.db.models import Q
+from django.utils import six
+from django.utils.translation import get_language, activate
+
+if six.PY2:  # pragma: no cover
+    import mock
+elif six.PY3:  # pragma: no cover
+    from unittest import mock
+
 User = get_user_model()
 
 
 class PlansTestCase(TestCase):
-    fixtures = ['initial_test_data', 'initial_plan', 'test_django-plans_auth', 'test_django-plans_plans']
+    fixtures = ['initial_test_data', 'initial_plan',
+                'test_django-plans_auth', 'test_django-plans_plans']
 
     def setUp(self):
         mail.outbox = []
@@ -43,13 +43,17 @@ class PlansTestCase(TestCase):
     def test_get_user_quota(self):
         u = User.objects.get(username='test1')
         self.assertEqual(get_user_quota(u),
-                         {u'CUSTOM_WATERMARK': 1, u'MAX_GALLERIES_COUNT': 3, u'MAX_PHOTOS_PER_GALLERY': None})
+                         {u'CUSTOM_WATERMARK': 1,
+                          u'MAX_GALLERIES_COUNT': 3,
+                          u'MAX_PHOTOS_PER_GALLERY': None})
 
     def test_get_plan_quota(self):
         u = User.objects.get(username='test1')
         p = u.userplan.plan
         self.assertEqual(p.get_quota_dict(),
-                         {u'CUSTOM_WATERMARK': 1, u'MAX_GALLERIES_COUNT': 3, u'MAX_PHOTOS_PER_GALLERY': None})
+                         {u'CUSTOM_WATERMARK': 1,
+                          u'MAX_GALLERIES_COUNT': 3,
+                          u'MAX_PHOTOS_PER_GALLERY': None})
 
     def test_save_adds_time_now_to_created(self):
         """
@@ -59,16 +63,17 @@ class PlansTestCase(TestCase):
         self.assertIsNotNone(plan.created)
         self.assertEqual(type(plan.created), type(datetime.now()))
 
-
     def test_extend_account_same_plan_future(self):
         u = User.objects.get(username='test1')
         u.userplan.expire = date.today() + timedelta(days=50)
         u.userplan.active = False
         u.userplan.save()
-        plan_pricing = PlanPricing.objects.get(plan=u.userplan.plan, pricing__period=30)
+        plan_pricing = PlanPricing.objects.get(plan=u.userplan.plan,
+                                               pricing__period=30)
         u.userplan.extend_account(plan_pricing.plan, plan_pricing.pricing)
-        self.assertEqual(u.userplan.expire,
-                         date.today() + timedelta(days=50) + timedelta(days=plan_pricing.pricing.period))
+        self.assertEqual(
+            u.userplan.expire, date.today() + timedelta(
+                days=50) + timedelta(days=plan_pricing.pricing.period))
         self.assertEqual(u.userplan.plan, plan_pricing.plan)
         self.assertEqual(u.userplan.active, True)
         self.assertEqual(len(mail.outbox), 1)
@@ -78,9 +83,12 @@ class PlansTestCase(TestCase):
         u.userplan.expire = date.today() - timedelta(days=50)
         u.userplan.active = False
         u.userplan.save()
-        plan_pricing = PlanPricing.objects.get(plan=u.userplan.plan, pricing__period=30)
+        plan_pricing = PlanPricing.objects.get(plan=u.userplan.plan,
+                                               pricing__period=30)
         u.userplan.extend_account(plan_pricing.plan, plan_pricing.pricing)
-        self.assertEqual(u.userplan.expire, date.today() + timedelta(days=plan_pricing.pricing.period))
+        self.assertEqual(
+            u.userplan.expire, date.today() + timedelta(
+                days=plan_pricing.pricing.period))
         self.assertEqual(u.userplan.plan, plan_pricing.plan)
         self.assertEqual(u.userplan.active, True)
         self.assertEqual(len(mail.outbox), 1)
@@ -96,9 +104,12 @@ class PlansTestCase(TestCase):
         u.userplan.expire = date.today() - timedelta(days=50)
         u.userplan.active = False
         u.userplan.save()
-        plan_pricing = PlanPricing.objects.filter(~Q(plan=u.userplan.plan) & Q(pricing__period=30))[0]
+        plan_pricing = PlanPricing.objects.filter(
+            ~Q(plan=u.userplan.plan) & Q(pricing__period=30))[0]
         u.userplan.extend_account(plan_pricing.plan, plan_pricing.pricing)
-        self.assertEqual(u.userplan.expire, date.today() + timedelta(days=plan_pricing.pricing.period))
+        self.assertEqual(
+            u.userplan.expire, date.today() + timedelta(
+                days=plan_pricing.pricing.period))
         self.assertEqual(u.userplan.plan, plan_pricing.plan)
         self.assertEqual(u.userplan.active, True)
         self.assertEqual(len(mail.outbox), 1)
@@ -154,15 +165,18 @@ class PlansTestCase(TestCase):
 
 
 class UserPlanTestcase(TestCase):
-    fixtures = ['initial_test_data', 'initial_plan', 'test_django-plans_auth', 'test_django-plans_plans']
+    fixtures = ['initial_test_data', 'initial_plan',
+                'test_django-plans_auth', 'test_django-plans_plans']
+
     def setUp(self):
-        self.userplan = User.objects.first().userplan # User plan which already expired
+        # User plan which already expired
+        self.userplan = User.objects.first().userplan
 
     def test_userplan_is_active_returns_active(self):
         """
         is_active should return userplan.active
         """
-        
+
         self.assertFalse(self.userplan.active)
         self.userplan.active = True
         self.assertTrue(self.userplan.is_active())
@@ -186,7 +200,7 @@ class UserPlanTestcase(TestCase):
 
     def test_is_expired_returns_true_if_expired(self):
         """
-        If plan is not None and has already expired, 
+        If plan is not None and has already expired,
         is_expired() should return True
         """
         delta = -3
@@ -205,11 +219,11 @@ class UserPlanTestcase(TestCase):
         If plan expired already, days_left() should return
         a negative number representing the number of days since that
         """
-        self.assertTrue(self.userplan.days_left()<0)
+        self.assertTrue(self.userplan.days_left() < 0)
 
     def test_days_left_returns_positive_not_expired_yet(self):
         """
-        If plan has not expired yet, days_left should return 
+        If plan has not expired yet, days_left should return
         a positive number of days representing the number of days
         left until the expiration
         """
@@ -218,9 +232,9 @@ class UserPlanTestcase(TestCase):
         self.assertEquals(delta, self.userplan.days_left())
 
 
-
 class TestInvoice(TestCase):
-    fixtures = ['initial_plan', 'test_django-plans_auth', 'test_django-plans_plans']
+    fixtures = ['initial_plan',
+                'test_django-plans_auth', 'test_django-plans_plans']
 
     def test_get_full_number(self):
         i = Invoice()
@@ -267,12 +281,18 @@ class TestInvoice(TestCase):
     def test_set_issuer_invoice_data(self):
         i = Invoice()
         i.set_issuer_invoice_data()
-        self.assertEqual(i.issuer_name, settings.PLANS_INVOICE_ISSUER['issuer_name'])
-        self.assertEqual(i.issuer_street, settings.PLANS_INVOICE_ISSUER['issuer_street'])
-        self.assertEqual(i.issuer_zipcode, settings.PLANS_INVOICE_ISSUER['issuer_zipcode'])
-        self.assertEqual(i.issuer_city, settings.PLANS_INVOICE_ISSUER['issuer_city'])
-        self.assertEqual(i.issuer_country, settings.PLANS_INVOICE_ISSUER['issuer_country'])
-        self.assertEqual(i.issuer_tax_number, settings.PLANS_INVOICE_ISSUER['issuer_tax_number'])
+        self.assertEqual(i.issuer_name,
+                         settings.PLANS_INVOICE_ISSUER['issuer_name'])
+        self.assertEqual(i.issuer_street,
+                         settings.PLANS_INVOICE_ISSUER['issuer_street'])
+        self.assertEqual(i.issuer_zipcode,
+                         settings.PLANS_INVOICE_ISSUER['issuer_zipcode'])
+        self.assertEqual(i.issuer_city,
+                         settings.PLANS_INVOICE_ISSUER['issuer_city'])
+        self.assertEqual(i.issuer_country,
+                         settings.PLANS_INVOICE_ISSUER['issuer_country'])
+        self.assertEqual(i.issuer_tax_number,
+                         settings.PLANS_INVOICE_ISSUER['issuer_tax_number'])
 
     # def test_set_buyer_invoice_data(self):
     #     i = Invoice()
@@ -501,26 +521,32 @@ class OrderTestCase(TestCase):
 
 
 class PlanChangePolicyTestCase(TestCase):
-    fixtures = ['initial_plan', 'test_django-plans_auth', 'test_django-plans_plans']
+    fixtures = ['initial_plan',
+                'test_django-plans_auth', 'test_django-plans_plans']
 
     def setUp(self):
         self.policy = PlanChangePolicy()
 
     def test_calculate_day_cost(self):
         plan = Plan.objects.get(pk=5)
-        self.assertEqual(self.policy._calculate_day_cost(plan, 13), Decimal('6.67'))
+        self.assertEqual(self.policy._calculate_day_cost(plan, 13),
+                         Decimal('6.67'))
 
     def test_get_change_price(self):
         p1 = Plan.objects.get(pk=3)
         p2 = Plan.objects.get(pk=4)
-        self.assertEqual(self.policy.get_change_price(p1, p2, 23), Decimal('7.82'))
-        self.assertEqual(self.policy.get_change_price(p2, p1, 23), None)
+        self.assertEqual(self.policy.get_change_price(p1, p2, 23),
+                         Decimal('7.82'))
+        self.assertEqual(self.policy.get_change_price(p2, p1, 23),
+                         None)
 
     def test_get_change_price1(self):
         p1 = Plan.objects.get(pk=3)
         p2 = Plan.objects.get(pk=4)
-        self.assertEqual(self.policy.get_change_price(p1, p2, 53), Decimal('18.02'))
-        self.assertEqual(self.policy.get_change_price(p2, p1, 53), None)
+        self.assertEqual(self.policy.get_change_price(p1, p2, 53),
+                         Decimal('18.02'))
+        self.assertEqual(self.policy.get_change_price(p2, p1, 53),
+                         None)
 
     def test_get_change_price2(self):
         p1 = Plan.objects.get(pk=3)
@@ -530,7 +556,8 @@ class PlanChangePolicyTestCase(TestCase):
 
 
 class StandardPlanChangePolicyTestCase(TestCase):
-    fixtures = ['initial_plan', 'test_django-plans_auth', 'test_django-plans_plans']
+    fixtures = ['initial_plan',
+                'test_django-plans_auth', 'test_django-plans_plans']
 
     def setUp(self):
         self.policy = StandardPlanChangePolicy()
@@ -538,7 +565,8 @@ class StandardPlanChangePolicyTestCase(TestCase):
     def test_get_change_price(self):
         p1 = Plan.objects.get(pk=3)
         p2 = Plan.objects.get(pk=4)
-        self.assertEqual(self.policy.get_change_price(p1, p2, 23), Decimal('8.60'))
+        self.assertEqual(self.policy.get_change_price(p1, p2, 23),
+                         Decimal('8.60'))
         self.assertEqual(self.policy.get_change_price(p2, p1, 23), None)
 
 class TaxationPolicyTestCase(TestCase):
@@ -553,7 +581,9 @@ class TaxationPolicyTestCase(TestCase):
         """
         tax_value = Decimal(15.0)
         with self.settings(PLANS_TAX=tax_value):
-            self.assertEquals(tax_value, self.taxation_policy.get_default_tax())
+            self.assertEquals(tax_value,
+                              self.taxation_policy.get_default_tax())
+
         with self.settings(PLANS_TAX=None):
             self.assertEquals(None, self.taxation_policy.get_default_tax())
 
@@ -572,7 +602,6 @@ class TaxationPolicyTestCase(TestCase):
         """
         with self.assertRaises(NotImplementedError):
             self.taxation_policy.get_tax_rate('tax_id', 'country_code')
-                
 
 
 class EUTaxationPolicyTestCase(TestCase):
@@ -581,7 +610,8 @@ class EUTaxationPolicyTestCase(TestCase):
 
     def test_none(self):
         with self.settings(PLANS_TAX=Decimal('23.0'), PLANS_TAX_COUNTRY='PL'):
-            self.assertEqual(self.policy.get_tax_rate(None, None), Decimal('23.0'))
+            self.assertEqual(self.policy.get_tax_rate(None, None),
+                             Decimal('23.0'))
 
     def test_private_nonEU(self):
         with self.settings(PLANS_TAX=Decimal('23.0'), PLANS_TAX_COUNTRY='PL'):
@@ -589,11 +619,13 @@ class EUTaxationPolicyTestCase(TestCase):
 
     def test_private_EU_same(self):
         with self.settings(PLANS_TAX=Decimal('23.0'), PLANS_TAX_COUNTRY='PL'):
-            self.assertEqual(self.policy.get_tax_rate(None, 'PL'), Decimal('23.0'))
+            self.assertEqual(self.policy.get_tax_rate(None, 'PL'),
+                             Decimal('23.0'))
 
     def test_private_EU_notsame(self):
         with self.settings(PLANS_TAX=Decimal('23.0'), PLANS_TAX_COUNTRY='PL'):
-            self.assertEqual(self.policy.get_tax_rate(None, 'AT'), Decimal('20.0'))
+            self.assertEqual(self.policy.get_tax_rate(None, 'AT'),
+                             Decimal('20.0'))
 
     def test_company_nonEU(self):
         with self.settings(PLANS_TAX=Decimal('23.0'), PLANS_TAX_COUNTRY='PL'):
@@ -601,7 +633,8 @@ class EUTaxationPolicyTestCase(TestCase):
 
     def test_company_EU_same(self):
         with self.settings(PLANS_TAX=Decimal('23.0'), PLANS_TAX_COUNTRY='PL'):
-            self.assertEqual(self.policy.get_tax_rate('123456', 'PL'), Decimal('23.0'))
+            self.assertEqual(self.policy.get_tax_rate('123456', 'PL'),
+                             Decimal('23.0'))
 
     @mock.patch("vatnumber.check_vies", lambda x: True)
     def test_company_EU_notsame_vies_ok(self):
@@ -611,15 +644,19 @@ class EUTaxationPolicyTestCase(TestCase):
     @mock.patch("vatnumber.check_vies", lambda x: False)
     def test_company_EU_notsame_vies_not_ok(self):
         with self.settings(PLANS_TAX=Decimal('23.0'), PLANS_TAX_COUNTRY='PL'):
-            self.assertEqual(self.policy.get_tax_rate('123456', 'AT'), Decimal('20.0'))
+            self.assertEqual(self.policy.get_tax_rate('123456', 'AT'),
+                             Decimal('20.0'))
 
 
 class ValidatorsTestCase(TestCase):
-    fixtures = ['initial_plan', 'test_django-plans_auth', 'test_django-plans_plans']
+    fixtures = ['initial_plan',
+                'test_django-plans_auth', 'test_django-plans_plans']
+
     def test_model_count_validator(self):
         """
-        We create a test model validator for User. It will raise ValidationError when QUOTA_NAME value
-        will be lower than number of elements of model User.
+        We create a test model validator for User. It will raise
+        ValidationError when QUOTA_NAME value will be lower than number of
+        elements of model User.
         """
 
         class TestValidator(ModelCountValidator):
@@ -627,9 +664,13 @@ class ValidatorsTestCase(TestCase):
             model = User
 
         validator_object = TestValidator()
-        self.assertRaises(ValidationError, validator_object, user=None, quota_dict={'QUOTA_NAME': 1})
-        self.assertEqual(validator_object(user=None, quota_dict={'QUOTA_NAME': 2}), None)
-        self.assertEqual(validator_object(user=None, quota_dict={'QUOTA_NAME': 3}), None)
+        self.assertRaises(ValidationError,
+                          validator_object, user=None,
+                          quota_dict={'QUOTA_NAME': 1})
+        self.assertEqual(validator_object(user=None,
+                                          quota_dict={'QUOTA_NAME': 2}), None)
+        self.assertEqual(validator_object(user=None,
+                                          quota_dict={'QUOTA_NAME': 3}), None)
 
 
         #   TODO: FIX this test not to use Pricing for testing  ModelAttributeValidator
@@ -660,6 +701,7 @@ class ImporterTestCase(TestCase):
         module_name = 'abc.ABCMeta'
         self.assertEqual(type(import_name(module_name)), type(TypeError))
 
+
 class ContribTestCase(TestCase):
 
     def setUp(self):
@@ -672,12 +714,16 @@ class ContribTestCase(TestCase):
         """
         activate('pt_BR')
         test_lang = get_language()
-        send_template_email(['test@test.com'], 'mail/change_plan_title.txt',
-            'mail/change_plan_body.txt', {}, 'en-us')
+        send_template_email(['test@test.com'],
+                            'mail/change_plan_title.txt',
+                            'mail/change_plan_body.txt', {}, 'en-us')
         self.assertEqual(test_lang, get_language())
 
+
 class FormsTestCase(TestCase):
-    fixtures = ['initial_plan', 'test_django-plans_auth', 'test_django-plans_plans']
+    fixtures = ['initial_plan',
+                'test_django-plans_auth', 'test_django-plans_plans']
+
     def setUp(self):
         pass
 
@@ -700,25 +746,25 @@ class FormsTestCase(TestCase):
         form = BillingInfoForm(data=data)
         self.assertFalse(form.is_valid())
         self.assertEqual(len(form.errors), 1)
-        
+
+
 class ViewsTestCase(TestCase):
-    fixtures = ['initial_plan', 'test_django-plans_auth', 'test_django-plans_plans']
-    
+    fixtures = ['initial_plan',
+                'test_django-plans_auth', 'test_django-plans_plans']
+
     def setUp(self):
         self.client = Client()
         self.user = User.objects.create_superuser(
             username='test', email='test@test.com', password='top_secret')
         self.client.login(username=self.user.username, password='top_secret')
-        
+
     def test_invoice_returns_html_if_not_wkhtmltopdf(self):
         """
         If wkhtmltopf is not installed, the invoice detail view
         should return the invoice as html
         """
-        response = self.client.get(reverse('invoice_preview', 
-            args=[Invoice.objects.first().pk]))
-        self.assertTrue(b'Content-Type: text/html' in response.serialize_headers())
+        response = self.client.get(
+            reverse('invoice_preview', args=[Invoice.objects.first().pk]))
+        self.assertTrue(
+            b'Content-Type: text/html' in response.serialize_headers())
         self.assertEqual(response.status_code, 200)
-        
-    
-    
