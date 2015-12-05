@@ -48,8 +48,8 @@ class PlanChangePolicy(object):
         if plan_new_day_cost <= plan_old_day_cost:
             return self._calculate_final_price(period, None)
         else:
-            return self._calculate_final_price(period, plan_new_day_cost - plan_old_day_cost)
-
+            return self._calculate_final_price(
+                period, plan_new_day_cost - plan_old_day_cost)
 
 
 class StandardPlanChangePolicy(PlanChangePolicy):
