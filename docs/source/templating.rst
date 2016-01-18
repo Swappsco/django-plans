@@ -2,7 +2,8 @@ Templates
 =========
 General django-plans templates
 ------------------------------
-
+django-plans uses its own templates to all the views related to its flow. If you want to use your custom templates, create a folder named ``templates/plans`` and include them in there with
+the same name that django-plans uses. Check ``django-plans/templates/plans`` for the name and the structure of each template.
 
 Account expiration warnings
 ---------------------------

@@ -17,7 +17,9 @@ Engine allows for the following customisation:
 Plan
 ----
 
-Plan stores information about single plan that is offered by a service. It is defined by the following properties:
+Plan stores information about single plan that is offered by a service. Each plan has related quotas and pricings that will define the permissions of the user using this plan and how much is going to pay to subscribe to it.
+
+It is defined by the following properties:
 
 ``name``
 ````````
