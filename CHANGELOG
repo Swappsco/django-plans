@@ -3,6 +3,9 @@ django-plans changelog
 
 0.8
 ---
+* Release version 0.8.10
+  * Updated invoice and invoice preview to use english.
+  * Updated documentation.
 * Release version 0.8.9
   * Updated project to work with django1.9.
   * Updated project to avoid deprecation warnings when running django.

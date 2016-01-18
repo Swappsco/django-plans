@@ -4,12 +4,12 @@
 
     <div style="float:right; text-align: right;">
         <h1>
-            <label><span class="pl invoice_header">{% if invoice.type == invoice.INVOICE_TYPES.INVOICE %}Invoice ID{% endif %}{% if invoice.type == invoice.INVOICE_TYPES.PROFORMA %}Order confirmation ID{% endif %}{% if invoice.type == invoice.INVOICE_TYPES.DUPLICATE %}Invoice (duplicate) ID{% endif %}</span></label> <span id="full_number">{{ invoice.full_number }}</span>
+            <label><span class="en invoice_header">{% if invoice.type == invoice.INVOICE_TYPES.INVOICE %}Invoice ID{% endif %}{% if invoice.type == invoice.INVOICE_TYPES.PROFORMA %}Order confirmation ID{% endif %}{% if invoice.type == invoice.INVOICE_TYPES.DUPLICATE %}Invoice (duplicate) ID{% endif %}</span></label> <span id="full_number">{{ invoice.full_number }}</span>
         </h1>
         <h2>{% if not copy %}ORIGINAL{% else %}COPY{% endif %}</h2>
-        <p> <label><span class="pl">Issued:</span> </label> {{ invoice.issued|date:"Y-m-d" }}</p>
+        <p> <label><span class="en">Issued:</span> </label> {{ invoice.issued|date:"Y-m-d" }}</p>
         {% if invoice.type != invoice.INVOICE_TYPES.PROFORMA %}{# Not a PROFORMA #}
-            <p> <label><span class="pl">Date of order:</span> </label> {{ invoice.selling_date|date:"Y-m-d" }}</p>
+            <p> <label><span class="en">Date of order:</span> </label> {{ invoice.selling_date|date:"Y-m-d" }}</p>
         {% else %}
             <p>&nbsp;</p>
         {% endif %}
@@ -20,7 +20,7 @@
             <td style="width: 50%;">
             </td>
             <td style="width: 50%; padding-right: 4em; font-weight: bold; font-size: 15px;" id="shipping">
-                <strong> <label><span class="pl">Shipping address:</span> </label></strong><br><br>
+                <strong> <label><span class="en">Shipping address:</span> </label></strong><br><br>
 
                 {{ invoice.shipping_name }}<br>
                 {{ invoice.shipping_street }}<br>
@@ -33,16 +33,16 @@
         <tr>
             <td style="width: 50%; 	vertical-align: top;">
 
-                <strong> <label><span class="pl">Seller:</span> </label></strong><br><br>
+                <strong> <label><span class="en">Seller:</span> </label></strong><br><br>
                 {{ invoice.issuer_name }}<br>
                 {{ invoice.issuer_street }}<br>
                 {{ invoice.issuer_zipcode }} {{ invoice.issuer_city}}<br>
                 {{ invoice.issuer_country.code }} - {{ invoice.issuer_country.name }}<p>
-            <label><span class="pl">VAT ID:</span></label> {{ invoice.issuer_tax_number }}<br>
+            <label><span class="en">VAT ID:</span></label> {{ invoice.issuer_tax_number }}<br>
             </td>
             <td style="width: 50%; 	vertical-align: top;">
 
-                <strong> <label><span class="pl">Buyer:</span> </label></strong><br><br>
+                <strong> <label><span class="en">Buyer:</span> </label></strong><br><br>
                 {{ invoice.buyer_name }}<br>
                 {{ invoice.buyer_street }}<br>
                 {{ invoice.buyer_zipcode }} {{ invoice.buyer_city }}<br>
@@ -51,7 +51,7 @@
                 {%  if invoice.buyer_tax_number %}
                     <p>
 
-                        <label><span class="pl">VAT ID:</span></label> {{ invoice.buyer_tax_number }}
+                        <label><span class="en">VAT ID:</span></label> {{ invoice.buyer_tax_number }}
 
                     </p>
                 {% endif %}
@@ -64,41 +64,41 @@
         <thead>
         <tr>
             <td>
-                <span class="pl">#</span>
+                <span class="en">#</span>
             </td>
             <td>
-                <span class="pl">Description</span>
+                <span class="en">Description</span>
 
             </td>
 
             <td>
-                <span class="pl">Unit&nbsp;price</span>
+                <span class="en">Unit&nbsp;price</span>
 
             </td>
             <td>
 
-                <span class="pl">Qty.</span>
+                <span class="en">Qty.</span>
             </td>
             {% if invoice.rebate %}
 
                 <td>
-                  <span class="pl">Rebate</span>
+                  <span class="en">Rebate</span>
 
                 </td>
             {%  endif %}
             <td>
-                <span class="pl">Subtotal</span>
+                <span class="en">Subtotal</span>
             </td>
             <td style="width: 3%;">
-                <span class="pl">TAX</span>
+                <span class="en">TAX</span>
             </td>
             <td>
 
-                <span class="pl">TAX/VAT&nbsp;Amount</span>
+                <span class="en">TAX/VAT&nbsp;Amount</span>
             </td>
             <td style="width: 8%;">
 
-                <span class="pl">Subtotal&nbsp;with&nbsp;TAX/VAT</span>
+                <span class="en">Subtotal&nbsp;with&nbsp;TAX/VAT</span>
             </td>
         </tr>
         </thead>
@@ -115,17 +115,17 @@
                 <td class="number">{{ invoice.rebate|floatformat:2 }}&nbsp;%</td>
             {%  endif %}
             <td class="number">{{ invoice.total_net|floatformat:2 }}&nbsp;{{ invoice.currency }}</td>
-            <td class="number">{% if invoice.tax != None %}{{ invoice.tax|floatformat:2 }}&nbsp;%{% else %}<span class="pl">n/a</span>{% endif %}</td>
-            <td class="number">{% if invoice.tax_total != None %}{{ invoice.tax_total|floatformat:2 }}&nbsp;{{ invoice.currency }}{% else %}<span class="pl">n/a</span>{% endif %}</td>
+            <td class="number">{% if invoice.tax != None %}{{ invoice.tax|floatformat:2 }}&nbsp;%{% else %}<span class="en">n/a</span>{% endif %}</td>
+            <td class="number">{% if invoice.tax_total != None %}{{ invoice.tax_total|floatformat:2 }}&nbsp;{{ invoice.currency }}{% else %}<span class="en">n/a</span>{% endif %}</td>
             <td class="number">{{ invoice.total|floatformat:2 }}&nbsp;{{ invoice.currency }}</td>
         </tr>
         </tbody>
         <tfoot>
         <tr>
-            <td colspan="{% if invoice.rebate %}5{% else %}4{%  endif %}" style="background-color: #EEE;"><label></span><span class="pl">Total:</span></label>  </td>
+            <td colspan="{% if invoice.rebate %}5{% else %}4{%  endif %}" style="background-color: #EEE;"><label></span><span class="en">Total:</span></label>  </td>
             <td>{{ invoice.total_net|floatformat:2 }}&nbsp;{{ invoice.currency }}</td>
-            <td>{% if invoice.tax != None %}{{ invoice.tax|floatformat:2 }}&nbsp;%{% else %}<span class="pl">n.p.</span><br><span class="en">n/a</span>{% endif %}</td>
-            <td>{% if invoice.tax_total != None %}{{ invoice.tax_total|floatformat:2 }}&nbsp;{{ invoice.currency }}{% else %}<span class="pl">n.p.</span><br><span class="en">n/a</span>{% endif %}</td>
+            <td>{% if invoice.tax != None %}{{ invoice.tax|floatformat:2 }}&nbsp;%{% else %}<span class="en">n.p.</span><br><span class="en">n/a</span>{% endif %}</td>
+            <td>{% if invoice.tax_total != None %}{{ invoice.tax_total|floatformat:2 }}&nbsp;{{ invoice.currency }}{% else %}<span class="en">n.p.</span><br><span class="en">n/a</span>{% endif %}</td>
             <td>{{ invoice.total|floatformat:2 }}&nbsp;{{ invoice.currency }}</td>
         </tr>
         </tfoot>
@@ -133,28 +133,28 @@
     <div style="width: 100%;">
 
         {% if invoice.type != invoice.INVOICE_TYPES.PROFORMA %}
-            <strong><label><span class="pl">Payment</span></label></strong>  <label> <span class="pl">electronic payment</span></label><br><br>
+            <strong><label><span class="en">Payment</span></label></strong>  <label> <span class="en">electronic payment</span></label><br><br>
         {% endif %}
 
 
-        <strong><label><span class="pl">Payment until: </span></label></strong>
+        <strong><label><span class="en">Payment until: </span></label></strong>
 
         {% if invoice.type == invoice.INVOICE_TYPES.PROFORMA %}
 
 
         {% else %}
-            <label> <span class="pl"> paid</span></label>
+            <label> <span class="en"> paid</span></label>
         {% endif %}
 
         {{ invoice.payment_date|date:"Y-m-d" }}
         <br><br>
         <hr>
 
-        {% if invoice.type == invoice.INVOICE_TYPES.PROFORMA %}<p><span class="pl">This document <strong>is not</strong> an invoice.</span></p> {% endif %}
+        {% if invoice.type == invoice.INVOICE_TYPES.PROFORMA %}<p><span class="en">This document <strong>is not</strong> an invoice.</span></p> {% endif %}
 
         {% if invoice.tax == None and invoice.is_UE_customer %}
             <p>
-              <span class="pl">Reverse charge.</span>
+              <span class="en">Reverse charge.</span>
             </p>
         {% endif %}
 
