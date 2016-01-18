@@ -254,7 +254,7 @@ Default: ``None``
 ``PLANS_TAXATION_POLICY``
 -------------------
 
-**Required**
+**Required if PLANS_TAX is not setted**
 
 Class that realises taxation of an order.
 

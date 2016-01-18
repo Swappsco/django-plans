@@ -30,14 +30,15 @@ Optionally create virtual environment and get required packages to run example p
 
 .. code-block:: bash
 
-    $ cd django-plans/demo/
-    $ pip install -r requirements.txt
+    $ cd django-plans
+    $ pip install -r /demo/requirements.txt
+    $ pip install -e .
 
 
 Initialize example project database:
 
 .. code-block:: bash
-
+	$ cd django-plans/demo/
     $ python manage.py migrate
 
 
