@@ -38,7 +38,7 @@ The basic django-plans urls are::
 
 .. note::
 
-    To access all the django-plans urls, as well as their names, access plans/urls.py file in the repository
+    To access all the django-plans urls, as well as their names, access ``plans/urls.py`` file in the repository
 
 Enable context processor
 -------------------------
