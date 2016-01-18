@@ -1,5 +1,8 @@
 Templates
 =========
+General django-plans templates
+------------------------------
+
 
 Account expiration warnings
 ---------------------------

@@ -22,6 +22,23 @@ Don't forget to run::
 
     $ python manage.py migrate
 
+Add django-plans urls
+---------------------
+Add django-plans urls to your URL general configuration::
+
+    add url(r'^', include('plans.urls')),
+
+The basic django-plans urls are::
+
+    http://localhost:8000/pricing/
+    http://localhost:8000/account/
+    http://localhost:8000/upgrade/
+    http://localhost:8000/order/
+    http://localhost:8000/billing/
+
+.. note::
+
+    To access all the django-plans urls, as well as their names, access plans/urls.py file in the repository
 
 Enable context processor
 -------------------------
