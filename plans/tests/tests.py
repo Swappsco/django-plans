@@ -2,7 +2,7 @@ from decimal import Decimal
 from datetime import date, datetime
 from datetime import timedelta
 import vatnumber
-
+from django.core.management import call_command
 from plans.models import (PlanPricing, Invoice, Order,
                           Plan, UserPlan, BillingInfo)
 from plans.plan_change import PlanChangePolicy, StandardPlanChangePolicy
@@ -768,3 +768,36 @@ class ViewsTestCase(TestCase):
         self.assertTrue(
             b'Content-Type: text/html' in response.serialize_headers())
         self.assertEqual(response.status_code, 200)
+
+# update_users_plans management command test
+
+
+class UpdateUsersPlansTestCase(TestCase):
+    fixtures = ['initial_test_data', 'initial_plan',
+                'test_django-plans_auth', 'test_django-plans_plans']
+
+    def setUp(self):
+        pass
+
+    def update_users_plans_create_userplan_for_user_that_dont_have(self):
+
+        """update_users_plans must create an UserPlan for each user in the database
+           that has none associated to him"""
+        testuser = User.objects.create(username='test',
+                                       email='test@test.com',
+                                       password='top_secret')
+        self.assertEqual(0, len(UserPlan.objects.all()))
+        call_command('update_users_plans')
+        self.assertEqual(1, len(UserPlan.objects.filter(user=testuser)))
+
+    def update_users_plans_must_not_modify_previosly_existing_userplan(self):
+        testuser1 = User.objects.get(username='test1')
+        testuser2 = User.objects.create(username='test',
+                                        email='test@test.com',
+                                        password='top_secret')
+        self.assertEqual(1, len(UserPlan.objects.filter(user=testuser1)))
+        self.assertEqual(0, len(UserPlan.objects.filter(user=testuser2)))
+        testuser1_plan = testuser1.userplan.plan
+        call_command('update_users_plans')
+        self.assertEqual(1, len(UserPlan.objects.filter(user=testuser2)))
+        self.assertEqual(testuser1_plan, testuser1.userplan.plan)
