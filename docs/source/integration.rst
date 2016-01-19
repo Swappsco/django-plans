@@ -63,3 +63,8 @@ You should send this signal providing ``user`` argument as an object of ``auth.U
     you are done. django-plans automagically integrates with this app
     (if it is available) and will activate user plan when django-registration
     send it's signal after account activation.
+
+.. note::
+    
+    For previously created users, you can run ``update_users_plans`` management command.
+    It will create a users plans instance for each User instance in the database. 
