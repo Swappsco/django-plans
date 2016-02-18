@@ -170,12 +170,12 @@ msgstr "periodo"
 
 #: plans/models.py:335
 msgid "Pricing"
-msgstr "Tarifa"
+msgstr "Planes"
 
 #: plans/models.py:336 plans/templates/plans/extend.html.py:41
 #: plans/templates/plans/plan_table.html:52
 msgid "Pricings"
-msgstr "Tarifas"
+msgstr "Planes"
 
 #: plans/models.py:339 plans/templates/plans/extend.html.py:45
 #: plans/templates/plans/plan_table.html:81
@@ -245,7 +245,7 @@ msgstr "retornado"
 
 #: plans/models.py:434
 msgid "pricing"
-msgstr "tarifa"
+msgstr "planes"
 
 #: plans/models.py:436
 msgid "completed"
