@@ -588,6 +588,7 @@ msgid ""
 msgstr ""
 "\n"
 "        Veja outros <a href=\"%(upgrade_url)s\">planos disponíveis</a>.\n"
+"    "
 
 #: templates/plans/expiration_messages.html:5
 #, python-format
@@ -599,6 +600,7 @@ msgid ""
 msgstr ""
 "\n"
 "            Sua conta expirou. Por favor, <a href=\"%(url)s\">extenda seu plano</a>.\n"
+"        "
 
 #: templates/plans/expiration_messages.html:13
 #, python-format
