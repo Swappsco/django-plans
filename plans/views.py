@@ -418,11 +418,12 @@ class BillingInfoRedirectView(LoginRequired, RedirectView):
     permanent = False
 
     def get_redirect_url(self, **kwargs):
+        next_url = self.request.GET.get('next', '')
         try:
             BillingInfo.objects.get(user=self.request.user)
         except BillingInfo.DoesNotExist:
-            return reverse('billing_info_create')
-        return reverse('billing_info_update')
+            return reverse('billing_info_create') + '?next=' + next_url
+        return reverse('billing_info_update') + '?next=' + next_url
 
 
 class BillingInfoCreateView(LoginRequired, CreateView):
@@ -441,6 +442,11 @@ class BillingInfoCreateView(LoginRequired, CreateView):
     def get_success_url(self):
         messages.success(self.request,
                          _('Billing info has been updated successfuly.'))
+        next_url = self.request.GET.get('next', '')
+        if next_url != '':
+            return next_url
+        else:
+            return reverse('billing_info_update')
         return reverse('billing_info_update')
 
 
@@ -460,8 +466,12 @@ class BillingInfoUpdateView(LoginRequired, UpdateView):
 
     def get_success_url(self):
         messages.success(self.request,
-                         _('Billing info has been updated successfuly.'))
-        return reverse('billing_info_update')
+                         _('Billing info has been updated successfully.'))
+        next_url = self.request.GET.get('next', '')
+        if next_url != '':
+            return next_url
+        else:
+            return reverse('billing_info_update')
 
 
 class BillingInfoDeleteView(LoginRequired, DeleteView):
