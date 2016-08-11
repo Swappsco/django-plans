@@ -5,7 +5,7 @@
 {% block body %}
     <div class="row">
         <div class="col-sm-6">
-            <form action="{% url 'billing_info_update' %}" method="post" class="form">
+          <form action="{{ request.get_full_path }}" method="post" class="form">
                 <legend>{% trans "Provide billing data" %}</legend>
                 {% csrf_token %}
                 {{ form.as_p }}

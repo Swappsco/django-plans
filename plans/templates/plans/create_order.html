@@ -33,7 +33,6 @@
                     {% blocktrans %}
                         Invoice for this order will be issued for:
                     {% endblocktrans %}
-
                     <br><br><b>
                     {{ billing_info.name }}<br>
                     {{ billing_info.street }}<br>
@@ -50,17 +49,11 @@
             {% else %}
                 <p class="alert alert-info">
                     {% blocktrans %}
-                        Invoice will <b>not</b> be issued. If you need an invoice please provide
-                        <a href="{{ billing_info_url }}">billing data</a> before making an order.
-                    {% endblocktrans %}
+                    Invoice will <b>not</b> be issued. If you need an invoice please provide {% endblocktrans %}<a href="{{ billing_info_url }}?next={{ request.path }}">{% trans 'billing data' %}</a> {% trans 'before making an order' %}.
                 </p>
             {% endif %}
-
             <p>
-
                 <input type="submit" class="btn btn-primary" value="{% trans "Continue" %}">
-
-
                 {{ form.as_p }}
                 {% csrf_token %}
         </form>
