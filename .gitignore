@@ -37,6 +37,7 @@ htmlcov/*
 
 #Virtualenv
 venv
+.env
 
 #sqlite
 *.sqlite
