@@ -98,14 +98,16 @@ class PlanTableViewBase(PlanTableMixin, ListView):
         queryset = super(
             PlanTableViewBase, self).get_queryset().prefetch_related(
                 'planpricing_set__pricing', 'planquota_set__quota')
+
         if self.request.user.is_authenticated():
             queryset = queryset.filter(
-                Q(available=True, visible=True) & (
-                    Q(customized=self.request.user) | Q(customized__isnull=True)
-                )
+                Q(available=True, visible=True) & (Q(
+                    customized=self.request.user) | Q(customized__isnull=True))
             )
         else:
-            queryset = queryset.filter(Q(available=True, visible=True) & Q(customized__isnull=True))
+            queryset = queryset.filter(Q(available=True, visible=True) & Q(
+                customized__isnull=True))
+
         return queryset
 
     def get_context_data(self, **kwargs):
@@ -113,14 +115,19 @@ class PlanTableViewBase(PlanTableMixin, ListView):
 
         if self.request.user.is_authenticated():
             try:
-                self.userplan = UserPlan.objects.select_related('plan').get(user=self.request.user)
+                self.userplan = UserPlan.objects.prefetch_related(
+                    'plan__planpricing_set__pricing',
+                    'plan__planquota_set__quota'
+                ).get(user=self.request.user)
             except UserPlan.DoesNotExist:
                 self.userplan = None
 
             context['userplan'] = self.userplan
 
             try:
-                context['current_userplan_index'] = list(self.object_list).index(self.userplan.plan)
+                context['current_userplan_index'] = list(
+                    self.object_list).index(self.userplan.plan)
+
             except (ValueError, AttributeError):
                 pass
 
@@ -165,8 +172,9 @@ class ChangePlanView(LoginRequired, View):
         return HttpResponseRedirect(reverse('upgrade_plan'))
 
     def post(self, request, *args, **kwargs):
-        plan = get_object_or_404(Plan, Q(pk=kwargs['pk']) & Q(available=True, visible=True) & (
-            Q(customized=request.user) | Q(customized__isnull=True)))
+        plan = get_object_or_404(Plan, Q(pk=kwargs['pk']) & Q(
+            available=True, visible=True) & (Q(customized=request.user) | Q(
+                customized__isnull=True)))
         if request.user.userplan.plan != plan:
             policy = import_name(
                 getattr(settings, 'PLANS_CHANGE_POLICY',
@@ -180,6 +188,7 @@ class ChangePlanView(LoginRequired, View):
                 request.user.userplan.extend_account(plan, None)
                 messages.success(request, _(
                     "Your plan has been successfully changed"))
+
             else:
                 return HttpResponseForbidden()
         return HttpResponseRedirect(reverse('upgrade_plan'))
@@ -189,12 +198,11 @@ class CreateOrderView(LoginRequired, CreateView):
     template_name = "plans/create_order.html"
     form_class = CreateOrderForm
 
-    #def get(self, request, **kwargs):
+    # def get(self, request, **kwargs):
     #    """
     #    If the user does not have a plan yet and the plan
     #    is a free plan, generating an order is not necessary
     #    """
-
 
     def recalculate(self, amount, billing_info):
         """
@@ -206,6 +214,7 @@ class CreateOrderView(LoginRequired, CreateView):
         country = getattr(billing_info, 'country', None)
         if not country is None:
             country = country.code
+
         tax_number = getattr(billing_info, 'tax_number', None)
 
         # Calculating tax can be complex task (e.g. VIES webservice call)
@@ -218,13 +227,16 @@ class CreateOrderView(LoginRequired, CreateView):
         if tax is None:
             tax = getattr(settings, 'PLANS_TAX', None)
             if tax is None:
-                taxation_policy = getattr(settings, 'PLANS_TAXATION_POLICY', None)
+                taxation_policy = getattr(settings,
+                                          'PLANS_TAXATION_POLICY', None)
                 if not taxation_policy:
-                    raise ImproperlyConfigured('PLANS_TAXATION_POLICY is not set')
+                    raise ImproperlyConfigured(
+                        'PLANS_TAXATION_POLICY is not set')
                 taxation_policy = import_name(taxation_policy)
                 tax = str(taxation_policy.get_tax_rate(tax_number, country))
-                # Because taxation policy could return None which clutters with saving this value
-                # into cache, we use str() representation of this value
+                # Because taxation policy could return None which clutters with
+                # saving this value into cache, we use str() representation of
+                # this value
                 self.request.session[tax_session_key] = tax
 
         order.tax = Decimal(tax) if tax != 'None' else None
@@ -251,13 +263,14 @@ class CreateOrderView(LoginRequired, CreateView):
                                                   Q(plan__customized=self.request.user) | Q(
                                                       plan__customized__isnull=True)))
 
-        # User is not allowed to create new order for Plan when he has different Plan
-        # unless it's a free plan. Otherwise, the should use Plan Change View for this
-        # kind of action
+        # User is not allowed to create new order for Plan when he has
+        # different plan unless it's a free plan. Otherwise, the should use
+        # Plan Change View for this kind of action
         if self.request.user.userplan.plan is not None:
             if not self.request.user.userplan.is_expired() \
                     and not self.request.user.userplan.plan.is_free() \
                     and self.request.user.userplan.plan != self.plan_pricing.plan:
+
                 raise Http404
 
         self.plan = self.plan_pricing.plan
@@ -266,6 +279,7 @@ class CreateOrderView(LoginRequired, CreateView):
     def get_billing_info(self):
         try:
             return self.request.user.billinginfo
+
         except BillingInfo.DoesNotExist:
             return None
 
@@ -316,8 +330,9 @@ class CreateOrderPlanChangeView(CreateOrderView):
     form_class = CreateOrderForm
 
     def get_all_context(self):
-        self.plan = get_object_or_404(Plan, Q(pk=self.kwargs['pk']) & Q(available=True, visible=True) & (
-            Q(customized=self.request.user) | Q(customized__isnull=True)))
+        self.plan = get_object_or_404(Plan, Q(pk=self.kwargs['pk']) & Q(
+            available=True, visible=True) & (Q(
+                customized=self.request.user) | Q(customized__isnull=True)))
         self.pricing = None
 
     def get_policy(self):
@@ -395,12 +410,12 @@ class OrderPaymentReturnView(LoginRequired, DetailView):
 
     def render_to_response(self, context, **response_kwargs):
         if self.status == 'success':
-            messages.success(self.request,
-                             _('Thank you for placing a payment. It will be processed as soon as possible.'))
+            messages.success(self.request, _(
+                'Thank you for placing a payment. It will be processed as soon as possible.'))
 
         elif self.status == 'failure':
-            messages.error(self.request,
-                           _('Payment was not completed correctly. Please repeat payment process.'))
+            messages.error(self.request, _(
+                'Payment was not completed correctly. Please repeat payment process.'))
 
         return HttpResponseRedirect(self.object.get_absolute_url())
 

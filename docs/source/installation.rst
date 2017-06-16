@@ -31,7 +31,7 @@ Optionally create virtual environment and get required packages to run example p
 .. code-block:: bash
 
     $ cd django-plans
-    $ pip install -r /demo/requirements.txt
+    $ pip install -r demo/requirements.txt
     $ pip install -e .
 
 
