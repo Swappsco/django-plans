@@ -40,3 +40,6 @@ venv
 
 #sqlite
 *.sqlite
+
+#Mac
+.DS_Store

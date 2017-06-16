@@ -113,7 +113,10 @@ class PlanTableViewBase(PlanTableMixin, ListView):
 
         if self.request.user.is_authenticated():
             try:
-                self.userplan = UserPlan.objects.select_related('plan').get(user=self.request.user)
+                self.userplan = UserPlan.objects.prefetch_related(
+                    'plan__planpricing_set__pricing',
+                    'plan__planquota_set__quota'
+                ).get(user=self.request.user)
             except UserPlan.DoesNotExist:
                 self.userplan = None
 
