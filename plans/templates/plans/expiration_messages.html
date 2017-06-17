@@ -17,7 +17,7 @@
         </div>
     {% endif %}
 
-    {% if EXPIRE_IN_DAYS >= 0 and EXPIRE_IN_DAYS <= 14 %}
+    {% if EXPIRE_IN_DAYS >= 0 and EXPIRE_IN_DAYS <= PLANS_EXPIRATION_REMIND_MESSAGE %}
         <div class="alert alert-warning">
             {% blocktrans with extend_url=EXTEND_URL days_to_expire=EXPIRE_IN_DAYS %}
                 Your account will expire soon (in {{ days_to_expire }} days).
