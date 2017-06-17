@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.core.urlresolvers import reverse
 
 from plans.models import UserPlan
@@ -19,12 +20,17 @@ def account_status(request):
 
     if request.user.is_authenticated():
         try:
+
             return {
                 'ACCOUNT_EXPIRED': request.user.userplan.is_expired(),
-                'ACCOUNT_NOT_ACTIVE': (not request.user.userplan.is_active() and not request.user.userplan.is_expired()),
+                'ACCOUNT_NOT_ACTIVE':
+                    (not request.user.userplan.is_active()
+                     and not request.user.userplan.is_expired()),
                 'EXPIRE_IN_DAYS': request.user.userplan.days_left(),
                 'EXTEND_URL': reverse('current_plan'),
                 'ACTIVATE_URL': reverse('account_activation'),
+                'PLANS_EXPIRATION_REMIND_MESSAGE': max(
+                    getattr(settings, 'PLANS_EXPIRATION_REMIND', [14])),
             }
         except UserPlan.DoesNotExist:
             pass
