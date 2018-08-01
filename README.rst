@@ -1,22 +1,8 @@
+WARNING: No longer maintained.
+Please refer to https://github.com/django-getpaid/django-plans .
+
 Welcome to django-plans
 =======================
-
-.. image:: https://travis-ci.org/swappsco/django-plans.svg?branch=master   
-   :target: https://travis-ci.org/swappsco/django-plans
-
-.. image:: https://coveralls.io/repos/swappsco/django-plans/badge.svg?branch=master&service=github
-   :target: https://coveralls.io/github/swappsco/django-plans?branch=master
-
-.. image:: https://requires.io/github/swappsco/django-plans/requirements.svg?branch=master
-     :target: https://requires.io/github/swappsco/django-plans/requirements/?branch=master
-     :alt: Requirements Status
-
-.. image:: https://badge.fury.io/py/django-plans.svg
-    :target: https://badge.fury.io/py/django-plans
-
-.. image:: https://readthedocs.org/projects/django-plans-swapps/badge/?version=latest
-	:target: http://django-plans-swapps.readthedocs.org/en/latest/?badge=latest
-	:alt: Documentation Status
    
 Django-plans is a pluggable app for managing pricing plans with quotas and accounts expiration. 
 Features currently supported:
